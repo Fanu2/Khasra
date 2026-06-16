@@ -1,13 +1,241 @@
-# Haryana Partition Manager - Phase 1
+# Haryana Partition Manager
 
-Project scaffold for:
-- Villages
-- Owners
-- Khewats
-- Ownership fractions
-- Partition engine
-- Reports
+A desktop application for managing land ownership, khewat partition workflows, khasra allocations, and audit history for Haryana revenue records.
 
-Install:
-pip install pyside6 sqlalchemy reportlab
+Built using **Python**, **PySide6**, **SQLAlchemy**, and **SQLite**.
+
+---
+
+## Overview
+
+Haryana Partition Manager is designed to simplify and digitize land partition workflows traditionally managed through revenue records such as:
+
+* Villages
+* Khewats
+* Ownership Shares
+* Khasras
+* Partition Registers
+* Allocation Transactions
+
+The application provides a structured workflow for managing ownership records, partition operations, and khasra allocation history with full audit tracking.
+
+---
+
+## Key Features
+
+### Village Management
+
+* Village master records
+* District, Tehsil, and Sub-Tehsil support
+* Hadbast number tracking
+* Jamabandi year management
+
+### Owner Management
+
+* Owner master database
+* Ownership share management
+* Multiple owners per khewat
+
+### Khewat Management
+
+* Create and edit khewats
+* Owner mapping
+* Share calculations
+* Ownership tracking
+
+### Partition Management
+
+#### Full Partition Wizard
+
+* Complete khewat partition workflow
+* Automatic share calculations
+* New khewat generation
+
+#### Partial Partition Wizard
+
+* Partial ownership separation
+* Share transfer management
+* Remaining share calculations
+* New khewat creation
+
+### Khasra Allocation Wizard
+
+* Allocate area from one khewat to another
+* Area split preview
+* Validation checks
+* Allocation transaction recording
+
+### Allocation Audit Trail
+
+* Allocation history recording
+* Undo allocation support
+* Audit tracking
+* Transaction logging
+
+### Search & Reporting
+
+* Universal Search
+* Partition Register
+* Khewat History
+* Ownership Reports
+
+### Database Utilities
+
+* Database Backup
+* Database Restore
+* SQLite storage engine
+
+---
+
+## Technology Stack
+
+| Component     | Technology          |
+| ------------- | ------------------- |
+| Language      | Python 3            |
+| GUI Framework | PySide6             |
+| ORM           | SQLAlchemy          |
+| Database      | SQLite              |
+| Architecture  | Desktop Application |
+
+---
+
+## Project Structure
+
+```text
+Haryana_Partition_Manager/
+│
+├── database/
+│   ├── db.py
+│   ├── models.py
+│   └── seed_data.py
+│
+├── gui/
+│   ├── main_window.py
+│   ├── owner_screen.py
+│   ├── village_screen.py
+│   ├── khewat_screen.py
+│   ├── partition_wizard.py
+│   ├── partial_partition_wizard.py
+│   ├── khasra_allocation_wizard.py
+│   ├── partition_register.py
+│   └── khewat_history.py
+│
+├── data/
+│   └── haryana.db
+│
+├── main.py
+└── README.md
+```
+
+---
+
+## Current Functionality
+
+### Implemented
+
+* Village Management
+* Owner Management
+* Khewat Management
+* Full Partition Wizard
+* Partial Partition Wizard
+* Khasra Allocation Wizard
+* Allocation Recording
+* Allocation History Recording
+* Undo Allocation
+* Partition Register
+* Khewat History
+* Universal Search
+* Database Backup & Restore
+
+### In Progress
+
+* Allocation Register Screen
+* Khasra History Screen
+* Allocation Service Layer
+
+### Planned
+
+* Parent/Child Khasra Split Engine
+* Khewat Family Tree
+* Road Reservation Module
+* Watercourse Reservation Module
+* Advanced Reporting Dashboard
+
+---
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Fanu2/Khasra.git
+cd Khasra
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the application:
+
+```bash
 python main.py
+```
+
+---
+
+## Database
+
+The application uses SQLite for local storage.
+
+Database file:
+
+```text
+data/haryana.db
+```
+
+All partition and allocation operations are stored for audit and recovery purposes.
+
+---
+
+## Roadmap
+
+### Release B
+
+* Allocation Register
+* Khasra History Register
+* Allocation Service Layer
+
+### Release C
+
+* Parent/Child Khasra Split Engine
+* Allocation Progress Tracking
+* Khewat Family Tree
+
+### Release D
+
+* Road Reservation
+* Watercourse Reservation
+* Advanced Land Record Analytics
+
+---
+
+## Contributing
+
+Contributions, bug reports, and feature suggestions are welcome.
+
+Please create an issue or submit a pull request.
+
+---
+
+## License
+
+MIT License
+
+---
+
+## Author
+
+Developed for digitizing Haryana land partition and revenue record management workflows.
