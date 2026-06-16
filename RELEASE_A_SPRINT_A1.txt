@@ -1,0 +1,2 @@
+Added KhasraAllocation and KhasraHistory model stubs.
+Next sprint: Allocation Register and history recording.
