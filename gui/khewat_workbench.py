@@ -110,7 +110,10 @@ class KhewatWorkbench(QWidget):
                 "Owner ID"
             ]
         )
-
+        self.owner_table.setColumnHidden(
+            4,
+            True
+        )
         layout.addWidget(
             self.owner_table
         )
@@ -240,7 +243,11 @@ class KhewatWorkbench(QWidget):
         lines.append("")
 
         lines.append(
-            f"Khewat No : {khewat.khewat_no}"
+            f"Village : {khewat.village.village_name}"
+        )
+
+        lines.append(
+           f"Khewat No : {khewat.khewat_no}"
         )
 
         lines.append(
@@ -281,8 +288,9 @@ class KhewatWorkbench(QWidget):
         total_share = Fraction(
             0,
             1
+          
         )
-
+        named_owner_area = 0
         for row, own in enumerate(
             ownerships
         ):
@@ -302,8 +310,9 @@ class KhewatWorkbench(QWidget):
             area_share = (
                 float(khewat.total_area)
                 * float(share)
+                
             )
-
+            named_owner_area += area_share
             self.owner_table.setItem(
                 row,
                 0,
@@ -347,7 +356,28 @@ class KhewatWorkbench(QWidget):
                     )
                 )
             )
+            others_area = (
+                float(khewat.total_area)
+                - named_owner_area
+            )
 
+            self.summary.append("")
+
+            self.summary.append(
+                f"Named Owners Area : "
+                f"{AreaService.format_area(named_owner_area)}"
+        )
+
+            self.summary.append(
+                f"Others Area : "
+                f"{AreaService.format_area(others_area)}"
+        )
+
+            self.summary.append(
+               f"Grand Total : "
+               f"{AreaService.format_area(khewat.total_area)}"
+               )
+            
         if total_share == Fraction(1, 1):
 
             self.lbl_validation.setText(
