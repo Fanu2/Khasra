@@ -26,6 +26,7 @@ from gui.export_screen import ExportScreen
 from gui.partition_register import PartitionRegister
 from gui.khewat_history import KhewatHistory
 from gui.khasra_allocation_wizard import KhasraAllocationWizard
+from gui.khewat_workbench import KhewatWorkbench
 
 
 class MainWindow(QMainWindow):
@@ -134,7 +135,18 @@ class MainWindow(QMainWindow):
         reports_menu.addAction(
             reports_action
         )
+        workbench_action = QAction(
+            "Khewat Workbench",
+            self
+        )
 
+        reports_menu.addAction(
+            workbench_action
+        )
+
+        workbench_action.triggered.connect(
+            self.open_khewat_workbench
+        )
         owner_action.triggered.connect(
             self.open_owners
         )
@@ -650,7 +662,23 @@ class MainWindow(QMainWindow):
                 "Khasra Allocation Error",
                 str(e)
             )
+    def open_khewat_workbench(self):
 
+        try:
+
+            self.workbench_window = (
+            KhewatWorkbench()
+        )
+
+            self.workbench_window.show()
+
+        except Exception as e:
+
+            QMessageBox.critical(
+            self,
+            "Workbench Error",
+            str(e)
+        )
 
     def undo_last_allocation(self):
 
