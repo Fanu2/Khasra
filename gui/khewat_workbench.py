@@ -10,7 +10,8 @@ from PySide6.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QTextEdit,
-    QMessageBox
+    QMessageBox,
+    QAbstractItemView
 )
 
 from database.db import SessionLocal
@@ -73,8 +74,46 @@ class KhewatWorkbench(QWidget):
             self.btn_load
         )
 
-        layout.addLayout(top)
+        top = QHBoxLayout()
 
+        top.addWidget(
+          QLabel("Select Khewat")
+        )
+
+        self.cmb_khewat = QComboBox()
+
+        top.addWidget(
+            self.cmb_khewat
+        )
+
+        self.btn_load = QPushButton(
+             "Load"
+        )
+
+        top.addWidget(
+        self.btn_load
+        )
+
+        self.btn_edit = QPushButton(
+            "Edit Ownership"
+        )
+
+        top.addWidget(
+            self.btn_edit
+        )
+
+        self.btn_save = QPushButton(
+        "Save Ownership"
+        )
+
+        self.btn_save.setEnabled(False)
+
+        top.addWidget(
+        self.btn_save
+        )
+
+        layout.addLayout(top)
+        
         # -----------------------------
         # Summary
         # -----------------------------
@@ -158,7 +197,13 @@ class KhewatWorkbench(QWidget):
         self.btn_load.clicked.connect(
             self.load_selected_khewat
         )
+        self.btn_edit.clicked.connect(
+            self.enable_editing
+        )
 
+        self.btn_save.clicked.connect(
+            self.save_ownerships
+        )
     # =====================================
     # LOAD LIST
     # =====================================
@@ -423,6 +468,44 @@ class KhewatWorkbench(QWidget):
                     )
                 )
             )
+    def enable_editing(self):
+
+            QMessageBox.information(
+                self,
+                "Edit Mode",
+                "Ownership editing enabled."
+            )
+
+            self.btn_save.setEnabled(
+            True
+        )
+    def save_ownerships(self):
+
+            rows = self.owner_table.rowCount()
+
+            msg = ""
+
+            for row in range(rows):
+
+             owner = self.owner_table.item(
+             row,
+             0
+            ).text()
+
+            share = self.owner_table.item(
+            row,
+            1
+            ).text()
+
+            msg += (
+            f"{owner} : {share}\n"
+        )
+
+            QMessageBox.information(
+            self,
+            "Edited Shares",
+            msg
+        )
 
     # =====================================
     # CLOSE
