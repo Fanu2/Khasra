@@ -509,6 +509,35 @@ class KhewatWorkbench(QWidget):
             )
 
         return changes        
+    
+    def persist_ownership_changes(self):
+
+        ownerships = self.current_khewat.ownerships
+
+        rows = self.owner_table.rowCount()
+
+        for row in range(rows):
+
+            share_text = (
+                self.owner_table.item(
+                    row,
+                    1
+                ).text().strip()
+            )
+
+            if "/" in share_text:
+
+                num, den = share_text.split("/")
+
+            else:
+
+                num = share_text
+                den = "1"
+
+            ownerships[row].numerator = int(num)
+            ownerships[row].denominator = int(den)
+
+        self.session.commit()
 
     def save_ownerships(self):
 
@@ -541,11 +570,26 @@ class KhewatWorkbench(QWidget):
                 f"{share}\n"
             )
 
+        reply = QMessageBox.question(
+        self,
+        "Confirm Ownership Update",
+        msg + "\n\nSave these changes?",
+        QMessageBox.Yes |
+        QMessageBox.No
+    )
+
+        if reply != QMessageBox.Yes:
+            return
+
+        self.persist_ownership_changes()
+
         QMessageBox.information(
             self,
-            "Ownership Preview",
-            msg
+            "Saved",
+            "Ownership changes saved."
         )
+
+        self.load_selected_khewat()
 
     def validate_shares(self):
 
