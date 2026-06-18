@@ -483,12 +483,39 @@ class KhewatWorkbench(QWidget):
             self.btn_save.setEnabled(
             True
         )
+    def get_changed_rows(self):
+
+        changes = []
+
+        rows = self.owner_table.rowCount()
+
+        for row in range(rows):
+
+            owner = self.owner_table.item(
+                row,
+                0
+            ).text()
+
+            share = self.owner_table.item(
+                row,
+                1
+            ).text()
+
+            changes.append(
+                (
+                  owner,
+                  share
+                )
+            )
+
+        return changes        
+
     def save_ownerships(self):
 
         total = self.validate_shares()
 
         if total is None:
-            return
+         return
 
         if total != Fraction(1, 1):
 
@@ -502,11 +529,23 @@ class KhewatWorkbench(QWidget):
 
             return
 
+        rows = self.get_changed_rows()
+
+        msg = ""
+
+        for owner, share in rows:
+
+            msg += (
+                f"{owner}"
+                f" : "
+                f"{share}\n"
+            )
+
         QMessageBox.information(
             self,
-            "Validation Passed",
-            "Ownership totals equal 100%."
-    )
+            "Ownership Preview",
+            msg
+        )
 
     def validate_shares(self):
 
@@ -519,18 +558,27 @@ class KhewatWorkbench(QWidget):
             for row in range(rows):
 
                 share_text = (
-                 self.owner_table.item(
+                    self.owner_table.item(
                        row,
                       1
                     ).text().strip()
                 )
 
-                num, den = share_text.split("/")
+                if "/" in share_text:
 
-                total += Fraction(
-                    int(num),
-                    int(den)
-                )
+                    num, den = share_text.split("/")
+
+                    total += Fraction(
+                        int(num),
+                        int(den)
+                    )
+
+                else:
+
+                    total += Fraction(
+                        int(share_text),
+                        1
+                    )
 
             return total
 
@@ -538,9 +586,9 @@ class KhewatWorkbench(QWidget):
 
             QMessageBox.critical(
                 self,
-                "Validation Error",
-                str(e)
-            )
+            "Validation Error",
+            str(e)
+        )
 
             return None
     # =====================================
