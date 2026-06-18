@@ -235,7 +235,43 @@ class Ownership(Base):
             f"{self.denominator}"
         )
 
+class OwnershipHistory(Base):
 
+    __tablename__ = "ownership_history"
+
+    id = Column(
+        Integer,
+        primary_key=True
+    )
+
+    khewat_id = Column(
+        Integer
+    )
+
+    owner_id = Column(
+        Integer
+    )
+
+    owner_name = Column(
+        String(200)
+    )
+
+    old_share = Column(
+        String(50)
+    )
+
+    new_share = Column(
+        String(50)
+    )
+
+    changed_on = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    remarks = Column(
+        Text
+    )
 # =====================================================
 # KHASRAS
 # =====================================================

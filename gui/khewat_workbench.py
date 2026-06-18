@@ -17,7 +17,11 @@ from PySide6.QtWidgets import (
 from database.db import SessionLocal
 
 from database.models import (
-    Khewat
+    Khewat,
+    Ownership,
+    Khasra,
+    Owner,
+    OwnershipHistory  
 )
 
 from services.area_service import (
@@ -534,11 +538,57 @@ class KhewatWorkbench(QWidget):
                 num = share_text
                 den = "1"
 
+            old_share = (
+                f"{ownerships[row].numerator}/"
+                f"{ownerships[row].denominator}"
+            )
+
+            new_share = (
+                f"{num}/{den}"
+            )
+
+            print(
+                "COMPARE:",
+                old_share,
+                "vs",
+                new_share
+            )
+
+            if old_share != new_share:
+
+                print(
+                    "HISTORY RECORD CREATED"
+                )
+
+                history = OwnershipHistory(
+
+                    khewat_id=
+                    self.current_khewat.id,
+
+                    owner_id=
+                    ownerships[row].owner.id,
+
+                    owner_name=
+                    ownerships[row].owner.owner_name,
+
+                    old_share=
+                    old_share,
+
+                    new_share=
+                    new_share,
+
+                    remarks=
+                    "Ownership edited in Workbench"
+                )
+
+                self.session.add(history)
+
             ownerships[row].numerator = int(num)
             ownerships[row].denominator = int(den)
 
+        print("COMMITTING...")
         self.session.commit()
-
+    
     def save_ownerships(self):
 
         total = self.validate_shares()
