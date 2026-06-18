@@ -249,7 +249,7 @@ class KhewatWorkbench(QWidget):
                 )
                 .first()
             )
-
+            self.current_khewat = khewat
             if not khewat:
                 return
 
@@ -336,6 +336,7 @@ class KhewatWorkbench(QWidget):
           
         )
         named_owner_area = 0
+        self.original_shares = {}
         for row, own in enumerate(
             ownerships
         ):
@@ -344,7 +345,10 @@ class KhewatWorkbench(QWidget):
                 own.numerator,
                 own.denominator
             )
-
+            self.original_shares[
+            own.owner.id
+            ] = str(share)
+            
             total_share += share
 
             pct = (
@@ -481,32 +485,64 @@ class KhewatWorkbench(QWidget):
         )
     def save_ownerships(self):
 
-            rows = self.owner_table.rowCount()
+        total = self.validate_shares()
 
-            msg = ""
+        if total is None:
+            return
+
+        if total != Fraction(1, 1):
+
+            QMessageBox.warning(
+                self,
+                "Invalid Ownership",
+                f"Total ownership is "
+                f"{float(total)*100:.4f}%\n\n"
+                f"Ownership must equal 100%."
+            )
+
+            return
+
+        QMessageBox.information(
+            self,
+            "Validation Passed",
+            "Ownership totals equal 100%."
+    )
+
+    def validate_shares(self):
+
+        total = Fraction(0, 1)
+
+        rows = self.owner_table.rowCount()
+
+        try:
 
             for row in range(rows):
 
-             owner = self.owner_table.item(
-             row,
-             0
-            ).text()
+                share_text = (
+                 self.owner_table.item(
+                       row,
+                      1
+                    ).text().strip()
+                )
 
-            share = self.owner_table.item(
-            row,
-            1
-            ).text()
+                num, den = share_text.split("/")
 
-            msg += (
-            f"{owner} : {share}\n"
-        )
+                total += Fraction(
+                    int(num),
+                    int(den)
+                )
 
-            QMessageBox.information(
-            self,
-            "Edited Shares",
-            msg
-        )
+            return total
 
+        except Exception as e:
+
+            QMessageBox.critical(
+                self,
+                "Validation Error",
+                str(e)
+            )
+
+            return None
     # =====================================
     # CLOSE
     # =====================================
