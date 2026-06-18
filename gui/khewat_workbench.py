@@ -611,7 +611,9 @@ class KhewatWorkbench(QWidget):
         if total is None:
          return
 
-        if total != Fraction(1, 1):
+        tolerance = 0.0001
+
+        if abs(float(total) - 1.0) > tolerance:
 
             QMessageBox.warning(
                 self,
@@ -688,7 +690,17 @@ class KhewatWorkbench(QWidget):
                         int(share_text),
                         1
                     )
+            print("\n===== SHARE CHECK =====")
 
+            for row in range(rows):
+                print(
+                    self.owner_table.item(row,0).text(),
+                    "=",
+                    self.owner_table.item(row,1).text()
+                )
+
+            print("TOTAL =", total)
+            print("PERCENT =", float(total) * 100)
             return total
 
         except Exception as e:
