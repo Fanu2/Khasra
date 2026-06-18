@@ -1,0 +1,116 @@
+from PySide6.QtWidgets import (
+    QDialog,
+    QVBoxLayout,
+    QTableWidget,
+    QTableWidgetItem
+)
+
+
+class OwnerMatrixDialog(QDialog):
+
+    def __init__(
+        self,
+        matrix,
+        parent=None
+    ):
+
+        super().__init__(parent)
+
+        self.matrix = matrix
+
+        print(
+            "MATRIX ROWS:",
+            len(self.matrix)
+        )
+
+        self.setWindowTitle(
+            "Owner Matrix"
+        )
+        
+        self.resize(
+            1000,
+            600
+        )
+
+        layout = QVBoxLayout()
+
+        layout = QVBoxLayout()
+
+        self.table = QTableWidget()
+
+        owners = sorted(
+            self.matrix.keys()
+        )
+
+        khewats = set()
+
+        for data in self.matrix.values():
+
+            for khewat in data.keys():
+
+                khewats.add(
+                    str(khewat)
+            )
+
+        khewats = sorted(
+            list(khewats)
+        )
+
+        self.table.setRowCount(
+            len(owners)
+        )
+
+        self.table.setColumnCount(
+            len(khewats)
+        )
+
+        self.table.setVerticalHeaderLabels(
+            owners
+        )
+
+        self.table.setHorizontalHeaderLabels(
+            khewats
+        )
+        print(
+            "ROWS:",
+            len(owners)
+        )
+
+        print(
+            "COLS:",
+            len(khewats)
+        )
+        for row, owner in enumerate(owners):
+
+            
+
+            for col, khewat in enumerate(khewats):
+
+                value = self.matrix.get(
+                    owner,
+                    {}
+                ).get(
+                    khewat,
+                    ""
+                )
+
+                print(
+                    owner,
+                    khewat,
+                    "=",
+                    value
+                )
+
+                self.table.setItem(
+                    row,
+                    col,
+                    QTableWidgetItem(value)
+                )
+               
+                layout.addWidget(
+                    self.table
+                )
+
+                self.setLayout(
+                    layout
+                )

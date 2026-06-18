@@ -1,3 +1,7 @@
+from gui.owner_matrix_dialog import (
+    OwnerMatrixDialog
+)
+
 from fractions import Fraction
 
 from PySide6.QtWidgets import (
@@ -100,7 +104,9 @@ class KhewatWorkbench(QWidget):
         self.btn_history = QPushButton(
             "Ownership History"
         )
-
+        self.btn_matrix = QPushButton(
+            "Owner Matrix"
+        )
         top.addWidget(
             self.btn_edit
         )
@@ -109,6 +115,9 @@ class KhewatWorkbench(QWidget):
         top.addWidget(
             self.btn_history
         )
+        top.addWidget(
+            self.btn_matrix
+)
         self.btn_save.setEnabled(False)
 
         top.addWidget(
@@ -210,6 +219,9 @@ class KhewatWorkbench(QWidget):
 
         self.btn_history.clicked.connect(
             self.show_ownership_history
+        )
+        self.btn_matrix.clicked.connect(
+            self.show_owner_matrix
         )
     # =====================================
     # LOAD LIST
@@ -688,7 +700,52 @@ class KhewatWorkbench(QWidget):
         )
 
             return None
-        
+    def build_owner_matrix(self):
+
+        matrix = {}
+
+        ownerships = (
+            self.session.query(
+                Ownership
+            ).all()
+        )
+
+        for o in ownerships:
+
+            owner_name = (
+                o.owner.owner_name
+            )
+
+            khewat_no = (
+                o.khewat.khewat_no
+            )
+
+            share = (
+                f"{o.numerator}/"
+                f"{o.denominator}"
+            )
+
+            if owner_name not in matrix:
+
+             matrix[owner_name] = {}
+
+            matrix[owner_name][
+                khewat_no
+            ] = share
+
+        return matrix
+
+    def show_owner_matrix(self):
+
+        matrix = self.build_owner_matrix()
+
+        dlg = OwnerMatrixDialog(
+            matrix,
+            self
+        )
+
+        dlg.exec()
+
     def show_ownership_history(self):
 
         history_rows = (
