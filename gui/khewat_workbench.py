@@ -28,6 +28,9 @@ from services.area_service import (
     AreaService
 )
 
+from gui.history_dialog import (
+    OwnershipHistoryDialog
+)
 
 class KhewatWorkbench(QWidget):
 
@@ -78,11 +81,7 @@ class KhewatWorkbench(QWidget):
             self.btn_load
         )
 
-        top = QHBoxLayout()
-
-        top.addWidget(
-          QLabel("Select Khewat")
-        )
+    
 
         self.cmb_khewat = QComboBox()
 
@@ -90,30 +89,30 @@ class KhewatWorkbench(QWidget):
             self.cmb_khewat
         )
 
-        self.btn_load = QPushButton(
-             "Load"
-        )
-
-        top.addWidget(
-        self.btn_load
-        )
-
         self.btn_edit = QPushButton(
             "Edit Ownership"
+        )
+
+        self.btn_save = QPushButton(
+            "Save Ownership"
+        )
+
+        self.btn_history = QPushButton(
+            "Ownership History"
         )
 
         top.addWidget(
             self.btn_edit
         )
 
-        self.btn_save = QPushButton(
-        "Save Ownership"
-        )
 
+        top.addWidget(
+            self.btn_history
+        )
         self.btn_save.setEnabled(False)
 
         top.addWidget(
-        self.btn_save
+            self.btn_save
         )
 
         layout.addLayout(top)
@@ -207,6 +206,10 @@ class KhewatWorkbench(QWidget):
 
         self.btn_save.clicked.connect(
             self.save_ownerships
+        )
+
+        self.btn_history.clicked.connect(
+            self.show_ownership_history
         )
     # =====================================
     # LOAD LIST
@@ -685,9 +688,44 @@ class KhewatWorkbench(QWidget):
         )
 
             return None
+        
+    def show_ownership_history(self):
+
+        history_rows = (
+            self.session.query(
+                OwnershipHistory
+            )
+            .filter(
+                OwnershipHistory.khewat_id ==
+                self.current_khewat.id
+            )
+            .order_by(
+                OwnershipHistory.id.desc()
+            )
+            .all()
+            )
+
+        if not history_rows:
+
+            QMessageBox.information(
+                self,
+                "History",
+                "No ownership history found."
+            )
+
+            return
+
+        dlg = OwnershipHistoryDialog(
+         history_rows,
+            self
+        )
+
+        dlg.exec()
+
     # =====================================
     # CLOSE
     # =====================================
+
 
     def closeEvent(self, event):
 
