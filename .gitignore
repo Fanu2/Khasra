@@ -1,4 +1,18 @@
+# Python
 __pycache__/
 *.pyc
-*.xlsx
+
+# Databases
 *.db
+
+# Excel exports
+*.xlsx
+
+# IDE
+.idea/
+.vscode/
+
+# Python virtual environments
+venv/
+.venv/
+env/
