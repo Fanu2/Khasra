@@ -163,19 +163,20 @@ class KhewatWorkbench(QWidget):
 
         self.owner_table = QTableWidget()
 
-        self.owner_table.setColumnCount(5)
+        self.owner_table.setColumnCount(6)
 
         self.owner_table.setHorizontalHeaderLabels(
             [
                 "Owner",
                 "Share",
                 "Share %",
-                "Area Share",
+                "Area (Marlas)",
+                "Area (K-M-S)",
                 "Owner ID"
             ]
         )
         self.owner_table.setColumnHidden(
-            4,
+            5,
             True
         )
         layout.addWidget(
@@ -422,6 +423,24 @@ class KhewatWorkbench(QWidget):
                 row,
                 3,
                 QTableWidgetItem(
+                    f"{area_share:.2f}"
+                )
+        )
+
+            self.owner_table.setItem(
+                row,
+                4,
+                QTableWidgetItem(
+                    AreaService.format_area(
+                        area_share
+            )
+                )
+        )
+
+            self.owner_table.setItem(
+                row,
+                4,
+                QTableWidgetItem(
                     AreaService.format_area(
                         area_share
                     )
@@ -430,31 +449,31 @@ class KhewatWorkbench(QWidget):
 
             self.owner_table.setItem(
                 row,
-                4,
+                5,
                 QTableWidgetItem(
                     str(
                         own.owner.id
-                    )
-                )
-            )
+        )
+    )
+)
             others_area = (
                 float(khewat.total_area)
                 - named_owner_area
             )
 
-            self.summary.append("")
+        self.summary.append("")
 
-            self.summary.append(
-                f"Named Owners Area : "
-                f"{AreaService.format_area(named_owner_area)}"
+        self.summary.append(
+            f"Named Owners Area : "
+            f"{AreaService.format_area(named_owner_area)}"
         )
 
-            self.summary.append(
-                f"Others Area : "
-                f"{AreaService.format_area(others_area)}"
+        self.summary.append(
+            f"Others Area : "
+            f"{AreaService.format_area(others_area)}"
         )
 
-            self.summary.append(
+        self.summary.append(
                f"Grand Total : "
                f"{AreaService.format_area(khewat.total_area)}"
                )
