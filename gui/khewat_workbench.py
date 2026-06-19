@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
 from database.db import SessionLocal
 
 from database.models import (
+    Village,
     Khewat,
     Ownership,
     Khasra,
@@ -62,7 +63,7 @@ class KhewatWorkbench(QWidget):
 
         self.build_ui()
 
-        self.load_khewats()
+        self.load_villages()
 
     # =====================================
     # UI
@@ -75,7 +76,17 @@ class KhewatWorkbench(QWidget):
         top = QHBoxLayout()
 
         top.addWidget(
-            QLabel("Select Khewat")
+            QLabel("Village")
+        )
+
+        self.cmb_village = QComboBox()
+
+        top.addWidget(
+            self.cmb_village
+        )
+
+        top.addWidget(
+            QLabel("Khewat")
         )
 
         self.cmb_khewat = QComboBox()
@@ -150,6 +161,9 @@ class KhewatWorkbench(QWidget):
 
         layout.addLayout(
             top
+        )
+        self.cmb_village.currentIndexChanged.connect(
+        self.load_khewats
         )
         
         # -----------------------------
@@ -257,17 +271,59 @@ class KhewatWorkbench(QWidget):
         self.btn_owner_ledger.clicked.connect(
             self.open_owner_ledger
         )
-        
+
     # =====================================
     # LOAD LIST
     # =====================================
+
+    # =====================================
+# LOAD LIST
+# =====================================
+
+    def load_villages(self):
+
+        self.cmb_village.clear()
+
+        villages = (
+            self.session.query(Village)
+            .order_by(
+                Village.village_name,
+                Village.jamabandi_year
+            )
+            .all()
+        )
+
+        for v in villages:
+
+            text = (
+                f"{v.village_name}"
+                f" ({v.jamabandi_year})"
+            )
+
+            self.cmb_village.addItem(
+                text,
+                v.id
+            )
+
+        self.load_khewats()
+
 
     def load_khewats(self):
 
         self.cmb_khewat.clear()
 
+        village_id = (
+            self.cmb_village.currentData()
+        )
+
+        if not village_id:
+            return
+
         khewats = (
             self.session.query(Khewat)
+            .filter(
+             Khewat.village_id == village_id
+            )
             .order_by(
                 Khewat.khewat_no
             )
@@ -277,9 +333,10 @@ class KhewatWorkbench(QWidget):
         for k in khewats:
 
             self.cmb_khewat.addItem(
-                str(k.khewat_no),
+             str(k.khewat_no),
                 k.id
             )
+        
 
     # =====================================
     # LOAD KHEWAT
