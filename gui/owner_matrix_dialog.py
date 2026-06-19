@@ -1,8 +1,10 @@
 from PySide6.QtWidgets import (
     QDialog,
     QVBoxLayout,
+    QHBoxLayout,
     QTableWidget,
-    QTableWidgetItem
+    QTableWidgetItem,
+    QCheckBox
 )
 
 
@@ -33,9 +35,29 @@ class OwnerMatrixDialog(QDialog):
         )
 
         layout = QVBoxLayout()
+        
+        filter_bar = QHBoxLayout()
 
-        layout = QVBoxLayout()
+        self.chk_hide_rows = QCheckBox(
+            "Hide Empty Rows"
+        )
 
+        self.chk_hide_cols = QCheckBox(
+            "Hide Empty Columns"
+        )
+
+        filter_bar.addWidget(
+            self.chk_hide_rows
+        )
+
+        filter_bar.addWidget(
+            self.chk_hide_cols
+        )
+
+        layout.addLayout(
+            filter_bar
+        )
+        
         self.table = QTableWidget()
 
         owners = sorted(
