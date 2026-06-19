@@ -39,6 +39,9 @@ from gui.history_dialog import (
 from gui.khewat_details_dialog import (
     KhewatDetailsDialog
 )
+from gui.owner_ledger_dialog import (
+    OwnerLedgerDialog
+)
 
 class KhewatWorkbench(QWidget):
 
@@ -100,7 +103,11 @@ class KhewatWorkbench(QWidget):
         self.btn_history = QPushButton(
             "Ownership History"
         )
-
+        
+        self.btn_owner_ledger = QPushButton(
+            "Owner Ledger"
+        )
+        
         self.btn_matrix = QPushButton(
          "Owner Matrix"
         )
@@ -108,6 +115,8 @@ class KhewatWorkbench(QWidget):
         self.btn_details = QPushButton(
          "Details"
         )
+        
+        
 
         self.btn_details.clicked.connect(
          self.open_details
@@ -133,6 +142,10 @@ class KhewatWorkbench(QWidget):
 
         top.addWidget(
             self.btn_save
+        )
+
+        top.addWidget(
+            self.btn_owner_ledger
         )
 
         layout.addLayout(
@@ -162,7 +175,10 @@ class KhewatWorkbench(QWidget):
         )
 
         self.owner_table = QTableWidget()
-
+        
+        self.owner_table.doubleClicked.connect(
+            self.open_owner_ledger
+        )
         self.owner_table.setColumnCount(6)
 
         self.owner_table.setHorizontalHeaderLabels(
@@ -237,6 +253,11 @@ class KhewatWorkbench(QWidget):
         self.btn_matrix.clicked.connect(
             self.show_owner_matrix
         )
+
+        self.btn_owner_ledger.clicked.connect(
+            self.open_owner_ledger
+        )
+        
     # =====================================
     # LOAD LIST
     # =====================================
@@ -801,7 +822,46 @@ class KhewatWorkbench(QWidget):
         )
 
         dlg.exec()
+    def open_owner_ledger(self):
 
+        row = self.owner_table.currentRow()
+
+        if row < 0:
+
+            QMessageBox.warning(
+                self,
+                "Owner Ledger",
+                "Please select an owner."
+            )
+
+            return
+
+        owner_id_item = self.owner_table.item(
+            row,
+            5
+        )
+
+        if not owner_id_item:
+
+            QMessageBox.warning(
+                self,
+                "Owner Ledger",
+                "Owner ID not found."
+            )
+
+            return
+
+        owner_id = int(
+            owner_id_item.text()
+        )
+
+        dlg = OwnerLedgerDialog(
+            owner_id,
+            self
+        )
+
+        dlg.exec()
+    
     def show_owner_matrix(self):
 
         matrix = self.build_owner_matrix()
