@@ -7,7 +7,10 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QPushButton,
     QMessageBox,
-    QFileDialog
+    QFileDialog,
+    QTextEdit,
+    QDialog,
+    QAbstractItemView
 )
 
 from openpyxl import Workbook
@@ -23,6 +26,8 @@ class OwnerMatrixDialog(QDialog):
         super().__init__(parent)
 
         self.matrix = matrix
+
+        
 
         print(
             "MATRIX ROWS:",
@@ -83,7 +88,19 @@ class OwnerMatrixDialog(QDialog):
         )
 
         self.table = QTableWidget()
+        
+        self.table.setEditTriggers(
+            QAbstractItemView.NoEditTriggers
+        )
 
+        self.table.setSelectionBehavior(
+            QAbstractItemView.SelectItems
+        )
+       
+        self.table.cellDoubleClicked.connect(
+            self.show_owner_summary
+        )
+        
         self.owners = sorted(
             self.matrix.keys()
         )
@@ -157,7 +174,8 @@ class OwnerMatrixDialog(QDialog):
         layout.addWidget(
             self.table
         )
-
+        self.table.resizeColumnsToContents()
+        
         self.setLayout(
             layout
         )
@@ -249,4 +267,54 @@ class OwnerMatrixDialog(QDialog):
             self,
             "Export Complete",
             f"Excel file saved:\n{file_name}"
+        )
+
+    def show_owner_summary(
+        self,
+        row,
+        col
+    ):
+
+        print(
+            "SHOW SUMMARY",
+            row,
+            col
+        )
+
+        owner = self.owners[row]
+
+        holdings = self.matrix.get(
+            owner,
+            {}
+        )
+
+        lines = []
+
+        lines.append(
+            f"Owner : {owner}"
+        )
+
+        lines.append(
+            "-" * 40
+        )
+
+        for khewat, share in sorted(
+            holdings.items()
+        ):
+
+            lines.append(
+                f"{khewat}    :    {share}"
+            )
+
+        lines.append("")
+
+        lines.append(
+            f"Total Holdings : "
+            f"{len(holdings)}"
+        )
+
+        QMessageBox.information(
+            self,
+            f"Owner Summary - {owner}",
+            "\n".join(lines)
         )
