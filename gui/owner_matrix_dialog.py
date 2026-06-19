@@ -20,22 +20,21 @@ class OwnerMatrixDialog(QDialog):
 
         self.matrix = matrix
 
-        print(
-            "MATRIX ROWS:",
-            len(self.matrix)
-        )
-
         self.setWindowTitle(
             "Owner Matrix"
         )
-        
+
         self.resize(
             1000,
             600
         )
 
         layout = QVBoxLayout()
-        
+
+        # -----------------
+        # FILTER BAR
+        # -----------------
+
         filter_bar = QHBoxLayout()
 
         self.chk_hide_rows = QCheckBox(
@@ -57,7 +56,19 @@ class OwnerMatrixDialog(QDialog):
         layout.addLayout(
             filter_bar
         )
-        
+
+        self.chk_hide_rows.stateChanged.connect(
+            self.refresh_matrix
+        )
+
+        self.chk_hide_cols.stateChanged.connect(
+            self.refresh_matrix
+        )
+
+        # -----------------
+        # TABLE
+        # -----------------
+
         self.table = QTableWidget()
 
         owners = sorted(
@@ -72,7 +83,7 @@ class OwnerMatrixDialog(QDialog):
 
                 khewats.add(
                     str(khewat)
-            )
+                )
 
         khewats = sorted(
             list(khewats)
@@ -93,34 +104,19 @@ class OwnerMatrixDialog(QDialog):
         self.table.setHorizontalHeaderLabels(
             khewats
         )
-        print(
-            "ROWS:",
-            len(owners)
-        )
 
-        print(
-            "COLS:",
-            len(khewats)
-        )
-        for row, owner in enumerate(owners):
+        for row, owner in enumerate(
+            owners
+        ):
 
-            
+            for col, khewat in enumerate(
+                khewats
+            ):
 
-            for col, khewat in enumerate(khewats):
-
-                value = self.matrix.get(
-                    owner,
-                    {}
-                ).get(
-                    khewat,
-                    ""
-                )
-
-                print(
-                    owner,
-                    khewat,
-                    "=",
-                    value
+                value = (
+                    self.matrix
+                    .get(owner, {})
+                    .get(khewat, "")
                 )
 
                 self.table.setItem(
@@ -128,11 +124,25 @@ class OwnerMatrixDialog(QDialog):
                     col,
                     QTableWidgetItem(value)
                 )
-               
-                layout.addWidget(
-                    self.table
-                )
 
-                self.setLayout(
-                    layout
-                )
+        self.table.resizeColumnsToContents()
+
+        layout.addWidget(
+            self.table
+        )
+
+        self.setLayout(
+            layout
+        )
+
+    def refresh_matrix(self):
+
+        print(
+            "Rows:",
+            self.chk_hide_rows.isChecked()
+        )
+
+        print(
+            "Cols:",
+            self.chk_hide_cols.isChecked()
+        )
