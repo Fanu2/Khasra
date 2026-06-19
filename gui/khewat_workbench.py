@@ -36,6 +36,10 @@ from gui.history_dialog import (
     OwnershipHistoryDialog
 )
 
+from gui.khewat_details_dialog import (
+    KhewatDetailsDialog
+)
+
 class KhewatWorkbench(QWidget):
 
     def __init__(self):
@@ -78,19 +82,11 @@ class KhewatWorkbench(QWidget):
         )
 
         self.btn_load = QPushButton(
-            "Load"
+         "Load"
         )
 
         top.addWidget(
             self.btn_load
-        )
-
-    
-
-        self.cmb_khewat = QComboBox()
-
-        top.addWidget(
-            self.cmb_khewat
         )
 
         self.btn_edit = QPushButton(
@@ -104,27 +100,44 @@ class KhewatWorkbench(QWidget):
         self.btn_history = QPushButton(
             "Ownership History"
         )
+
         self.btn_matrix = QPushButton(
-            "Owner Matrix"
+         "Owner Matrix"
         )
+
+        self.btn_details = QPushButton(
+         "Details"
+        )
+
+        self.btn_details.clicked.connect(
+         self.open_details
+        )
+
         top.addWidget(
             self.btn_edit
         )
 
-
         top.addWidget(
             self.btn_history
         )
+
         top.addWidget(
             self.btn_matrix
-)
+        )
+
+        top.addWidget(
+            self.btn_details
+        )
+
         self.btn_save.setEnabled(False)
 
         top.addWidget(
             self.btn_save
         )
 
-        layout.addLayout(top)
+        layout.addLayout(
+            top
+        )
         
         # -----------------------------
         # Summary
@@ -746,6 +759,29 @@ class KhewatWorkbench(QWidget):
             ] = share
 
         return matrix
+
+    def open_details(self):
+
+        khewat_id = (
+            self.cmb_khewat.currentData()
+        )
+
+        if not khewat_id:
+
+            QMessageBox.warning(
+                self,
+                "Details",
+                "Please select a Khewat."
+            )
+
+            return
+
+        dlg = KhewatDetailsDialog(
+            khewat_id,
+        self
+        )
+
+        dlg.exec()
 
     def show_owner_matrix(self):
 

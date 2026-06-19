@@ -4,8 +4,13 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QTableWidget,
     QTableWidgetItem,
-    QCheckBox
+    QCheckBox,
+    QPushButton,
+    QMessageBox,
+    QFileDialog
 )
+
+from openpyxl import Workbook
 
 
 class OwnerMatrixDialog(QDialog):
@@ -15,10 +20,14 @@ class OwnerMatrixDialog(QDialog):
         matrix,
         parent=None
     ):
-
         super().__init__(parent)
 
         self.matrix = matrix
+
+        print(
+            "MATRIX ROWS:",
+            len(self.matrix)
+        )
 
         self.setWindowTitle(
             "Owner Matrix"
@@ -31,10 +40,6 @@ class OwnerMatrixDialog(QDialog):
 
         layout = QVBoxLayout()
 
-        # -----------------
-        # FILTER BAR
-        # -----------------
-
         filter_bar = QHBoxLayout()
 
         self.chk_hide_rows = QCheckBox(
@@ -45,12 +50,20 @@ class OwnerMatrixDialog(QDialog):
             "Hide Empty Columns"
         )
 
+        self.btn_export = QPushButton(
+            "Export Excel"
+        )
+
         filter_bar.addWidget(
             self.chk_hide_rows
         )
 
         filter_bar.addWidget(
             self.chk_hide_cols
+        )
+
+        filter_bar.addWidget(
+            self.btn_export
         )
 
         layout.addLayout(
@@ -65,13 +78,13 @@ class OwnerMatrixDialog(QDialog):
             self.refresh_matrix
         )
 
-        # -----------------
-        # TABLE
-        # -----------------
+        self.btn_export.clicked.connect(
+            self.export_excel
+        )
 
         self.table = QTableWidget()
 
-        owners = sorted(
+        self.owners = sorted(
             self.matrix.keys()
         )
 
@@ -85,47 +98,61 @@ class OwnerMatrixDialog(QDialog):
                     str(khewat)
                 )
 
-        khewats = sorted(
+        self.khewats = sorted(
             list(khewats)
         )
 
         self.table.setRowCount(
-            len(owners)
+            len(self.owners)
         )
 
         self.table.setColumnCount(
-            len(khewats)
+            len(self.khewats)
         )
 
         self.table.setVerticalHeaderLabels(
-            owners
+            self.owners
         )
 
         self.table.setHorizontalHeaderLabels(
-            khewats
+            self.khewats
+        )
+
+        print(
+            "ROWS:",
+            len(self.owners)
+        )
+
+        print(
+            "COLS:",
+            len(self.khewats)
         )
 
         for row, owner in enumerate(
-            owners
+            self.owners
         ):
 
+            owner_data = self.matrix.get(
+                owner,
+                {}
+            )
+
             for col, khewat in enumerate(
-                khewats
+                self.khewats
             ):
 
-                value = (
-                    self.matrix
-                    .get(owner, {})
-                    .get(khewat, "")
+                value = owner_data.get(
+                    khewat,
+                    ""
                 )
 
                 self.table.setItem(
                     row,
                     col,
-                    QTableWidgetItem(value)
+                    QTableWidgetItem(
+                        str(value)
+                    )
                 )
-
-        self.table.resizeColumnsToContents()
 
         layout.addWidget(
             self.table
@@ -136,13 +163,90 @@ class OwnerMatrixDialog(QDialog):
         )
 
     def refresh_matrix(self):
+        """
+        Placeholder.
+        Actual hide-row/hide-column logic
+        can be implemented later.
+        """
+        pass
 
-        print(
-            "Rows:",
-            self.chk_hide_rows.isChecked()
+    def export_excel(self):
+
+        file_name, _ = QFileDialog.getSaveFileName(
+            self,
+            "Export Owner Matrix",
+            "owner_matrix.xlsx",
+            "Excel Files (*.xlsx)"
         )
 
-        print(
-            "Cols:",
-            self.chk_hide_cols.isChecked()
+        if not file_name:
+            return
+
+        wb = Workbook()
+
+        ws = wb.active
+
+        ws.title = "Owner Matrix"
+
+        # Header row
+
+        ws.cell(
+            row=1,
+            column=1,
+            value="Owner"
+        )
+
+        for col, khewat in enumerate(
+            self.khewats,
+            start=2
+        ):
+
+            ws.cell(
+                row=1,
+                column=col,
+                value=str(khewat)
+            )
+
+        # Matrix data
+
+        for row, owner in enumerate(
+            self.owners,
+            start=2
+        ):
+
+            ws.cell(
+                row=row,
+                column=1,
+                value=owner
+            )
+
+            for col, khewat in enumerate(
+                self.khewats,
+                start=2
+            ):
+
+                item = self.table.item(
+                    row - 2,
+                    col - 2
+                )
+
+                value = ""
+
+                if item:
+                    value = item.text()
+
+                ws.cell(
+                    row=row,
+                    column=col,
+                    value=value
+                )
+
+        wb.save(
+            file_name
+        )
+
+        QMessageBox.information(
+            self,
+            "Export Complete",
+            f"Excel file saved:\n{file_name}"
         )
