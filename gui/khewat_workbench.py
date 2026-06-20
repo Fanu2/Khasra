@@ -44,6 +44,10 @@ from gui.owner_ledger_dialog import (
     OwnerLedgerDialog
 )
 
+from gui.share_calculator_dialog import (
+    ShareCalculatorDialog
+)
+
 class KhewatWorkbench(QWidget):
 
     def __init__(self):
@@ -128,11 +132,16 @@ class KhewatWorkbench(QWidget):
         )
         
         
-
         self.btn_details.clicked.connect(
          self.open_details
         )
 
+        self.btn_share_calc = QPushButton(
+            "Share Calculator"
+        )
+        self.btn_share_calc.clicked.connect(
+            self.open_share_calculator
+        )
         top.addWidget(
             self.btn_edit
         )
@@ -156,6 +165,10 @@ class KhewatWorkbench(QWidget):
         )
 
         top.addWidget(
+            self.btn_share_calc
+        )
+        
+        top.addWidget(
             self.btn_owner_ledger
         )
 
@@ -165,6 +178,7 @@ class KhewatWorkbench(QWidget):
         self.cmb_village.currentIndexChanged.connect(
         self.load_khewats
         )
+        
         
         # -----------------------------
         # Summary
@@ -958,6 +972,14 @@ class KhewatWorkbench(QWidget):
 
         dlg = OwnershipHistoryDialog(
          history_rows,
+            self
+        )
+
+        dlg.exec()
+        
+    def open_share_calculator(self):
+
+        dlg = ShareCalculatorDialog(
             self
         )
 
