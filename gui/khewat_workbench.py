@@ -52,6 +52,9 @@ from gui.area_calculator_dialog import (
     AreaCalculatorDialog
 )
 
+from gui.jamabandi_import_dialog import (
+    JamabandiImportDialog
+)
 class KhewatWorkbench(QWidget):
 
     def __init__(self):
@@ -150,14 +153,23 @@ class KhewatWorkbench(QWidget):
         self.btn_area_calc = QPushButton(
             "Area Calculator"
         )
+        self.btn_jamabandi_import = QPushButton(
+            "Import Jamabandi HTML"
+        )
         self.btn_area_calc.clicked.connect(
             self.open_area_calculator
         )
+        self.btn_jamabandi_import.clicked.connect(
+            self.open_jamabandi_import
+        )
+        
 
         top.addWidget(
             self.btn_area_calc
         )
-
+        top.addWidget(
+            self.btn_jamabandi_import
+        )
         top.addWidget(
             self.btn_edit
         )
@@ -309,6 +321,17 @@ class KhewatWorkbench(QWidget):
     # =====================================
 # LOAD LIST
 # =====================================
+    def open_jamabandi_import(self):
+
+        print(
+            "JAMABANDI BUTTON CLICKED"
+        )
+
+        dlg = JamabandiImportDialog(
+            self
+        )
+
+        dlg.exec()
 
     def load_villages(self):
 
