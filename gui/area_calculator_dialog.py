@@ -5,7 +5,8 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QPushButton,
     QWidget,
-    QTabWidget
+    QTabWidget,
+    QGridLayout
 )
 
 class AreaCalculatorDialog(QDialog):
@@ -220,6 +221,103 @@ class AreaCalculatorDialog(QDialog):
             layout
         )
 
+# -------------------------
+
+# Polygon Tab
+# -------------------------
+
+        self.polygon_tab = QWidget()
+
+        self.tabs.addTab(
+    self.polygon_tab,
+    "Polygon"
+)
+
+        poly_layout = QVBoxLayout()
+
+        self.polygon_tab.setLayout(
+            poly_layout
+        )
+
+# -------------------------
+# Point Entry Grid
+# -------------------------
+
+        self.points_widget = QWidget()
+
+        self.points_layout = QGridLayout()
+
+        self.points_widget.setLayout(
+            self.points_layout
+        )
+
+        poly_layout.addWidget(
+            self.points_widget
+    )
+
+# Headers
+
+        self.points_layout.addWidget(
+            QLabel("X"),
+            0,
+            0
+        )
+
+        self.points_layout.addWidget(
+            QLabel("Y"),
+            0,
+            1
+        )
+
+        self.point_rows = []
+
+# -------------------------
+# Buttons
+# -------------------------
+
+        self.btn_add_point = QPushButton(
+            "Add Point"
+        )
+
+        poly_layout.addWidget(
+            self.btn_add_point
+        )
+
+        self.btn_polygon = QPushButton(
+            "Calculate Polygon"
+        )
+
+        poly_layout.addWidget(
+            self.btn_polygon
+        )
+
+        self.lbl_polygon_result = QLabel(
+    "Polygon Area :"
+)
+
+        poly_layout.addWidget(
+            self.lbl_polygon_result
+        )
+
+# -------------------------
+# Connections
+# -------------------------
+
+        self.btn_add_point.clicked.connect(
+            self.add_point_row
+        )
+
+        self.btn_polygon.clicked.connect(
+            self.calculate_polygon
+        )
+
+# -------------------------
+# Initial Rows
+# -------------------------
+
+        for _ in range(4):
+            self.add_point_row()
+
     def calculate_rectangle(self):
 
         try:
@@ -325,7 +423,113 @@ class AreaCalculatorDialog(QDialog):
             except Exception as e:
 
                 print(e)
+    def add_point_row(self):
 
+        row = len(
+            self.point_rows
+        ) + 1
+
+        txt_x = QLineEdit()
+
+        txt_y = QLineEdit()
+
+        self.points_layout.addWidget(
+         txt_x,
+            row,
+            0
+        )
+
+        self.points_layout.addWidget(
+            txt_y,
+            row,
+            1
+        )
+
+        self.point_rows.append(
+            (
+                txt_x,
+                txt_y
+            )
+        )
+    
+    def calculate_polygon(self):
+
+        try:
+
+            points = []
+
+            for (
+                txt_x,
+                txt_y
+            ) in self.point_rows:
+
+                x_text = (
+                    txt_x.text().strip()
+                )
+
+                y_text = (
+                    txt_y.text().strip()
+                )
+
+                if not x_text or not y_text:
+
+                    continue
+
+                points.append(
+                    (
+                        float(x_text),
+                        float(y_text)
+                    )
+                )
+
+            if len(points) < 3:
+
+                self.lbl_polygon_result.setText(
+                    "Minimum 3 points required"
+                )
+
+                return
+
+            area = 0
+
+            n = len(points)
+
+            for i in range(n):
+
+                x1, y1 = points[i]
+
+                x2, y2 = points[
+                (i + 1) % n
+                ]
+
+                area += (
+                    x1 * y2
+                    - y1 * x2
+                )
+
+            sq_karam = abs(
+                area
+            ) / 2
+
+            marla = (
+                sq_karam / 9
+            )
+
+            kms = self.marla_to_kms(
+             marla
+            )
+
+            self.lbl_polygon_result.setText(
+                f"Area:\n"
+                f"{sq_karam:.2f} Sq Karam\n"
+                f"{marla:.2f} Marla\n"
+                f"{kms}"
+            )
+
+        except Exception as e:
+
+            print(e)
+        
     def marla_to_kms(
         self,
         marlas
