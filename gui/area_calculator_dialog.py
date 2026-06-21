@@ -3,16 +3,17 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QLabel,
     QLineEdit,
-    QPushButton
+    QPushButton,
+    QWidget,
+    QTabWidget
 )
-
 
 class AreaCalculatorDialog(QDialog):
 
     def __init__(
         self,
         parent=None
-    ):
+        ):
 
         super().__init__(parent)
 
@@ -27,27 +28,42 @@ class AreaCalculatorDialog(QDialog):
 
         layout = QVBoxLayout()
 
-        # -------------------------
-        # Length
-        # -------------------------
+        self.tabs = QTabWidget()
 
         layout.addWidget(
-            QLabel(
-                "Length (Karam)"
+            self.tabs
+        )
+
+# -------------------------
+# Rectangle Tab
+# -------------------------
+
+        self.rectangle_tab = QWidget()
+
+        self.tabs.addTab(
+            self.rectangle_tab,
+                "Rectangle"
+        )
+
+        rect_layout = QVBoxLayout()
+
+        self.rectangle_tab.setLayout(
+            rect_layout
+        )
+
+        rect_layout.addWidget(
+        QLabel(
+            "Length (Karam)"
             )
         )
 
         self.txt_length = QLineEdit()
 
-        layout.addWidget(
+        rect_layout.addWidget(
             self.txt_length
         )
 
-        # -------------------------
-        # Width
-        # -------------------------
-
-        layout.addWidget(
+        rect_layout.addWidget(
             QLabel(
                 "Width (Karam)"
             )
@@ -55,13 +71,9 @@ class AreaCalculatorDialog(QDialog):
 
         self.txt_width = QLineEdit()
 
-        layout.addWidget(
-            self.txt_width
+        rect_layout.addWidget(
+                self.txt_width
         )
-
-        # -------------------------
-        # Button
-        # -------------------------
 
         self.btn_calc = QPushButton(
             "Calculate Rectangle"
@@ -71,24 +83,34 @@ class AreaCalculatorDialog(QDialog):
             self.calculate_rectangle
         )
 
-        layout.addWidget(
+        rect_layout.addWidget(
             self.btn_calc
         )
-
-        # -------------------------
-        # Result
-        # -------------------------
 
         self.lbl_result = QLabel(
             "Area :"
         )
 
-        layout.addWidget(
+        rect_layout.addWidget(
             self.lbl_result
         )
 
+# -------------------------
+# Future Tabs
+# -------------------------
+
+        self.tabs.addTab(
+            QWidget(),
+                "Triangle"
+        )
+
+        self.tabs.addTab(
+            QWidget(),
+                "Pythagoras"
+        )
+
         self.setLayout(
-            layout
+             layout
         )
 
     def calculate_rectangle(self):
