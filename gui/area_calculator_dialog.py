@@ -96,21 +96,128 @@ class AreaCalculatorDialog(QDialog):
         )
 
 # -------------------------
-# Future Tabs
+# Triangle Tab
 # -------------------------
 
+        self.triangle_tab = QWidget()
+
         self.tabs.addTab(
-            QWidget(),
+            self.triangle_tab,
                 "Triangle"
         )
 
+        tri_layout = QVBoxLayout()
+
+        self.triangle_tab.setLayout(
+            tri_layout
+        )
+
+        tri_layout.addWidget(
+            QLabel(
+                "Base (Karam)"
+            )
+        )
+    
+
+        self.txt_base = QLineEdit()
+
+        tri_layout.addWidget(
+            self.txt_base
+        )
+
+        tri_layout.addWidget(
+            QLabel(
+                "Height (Karam)"
+            )
+        )
+
+        self.txt_height = QLineEdit()
+
+        tri_layout.addWidget(
+            self.txt_height
+        )
+
+        self.btn_triangle = QPushButton(
+            "Calculate Triangle"
+        )
+
+        tri_layout.addWidget(
+            self.btn_triangle
+        )
+
+        self.lbl_triangle_result = QLabel(
+            "Area :"
+        )
+
+        tri_layout.addWidget(
+        self.lbl_triangle_result
+        )
+
+        self.btn_triangle.clicked.connect(
+            self.calculate_triangle
+        )
+
+
+
+        self.pyth_tab = QWidget()
+
         self.tabs.addTab(
-            QWidget(),
-                "Pythagoras"
+            self.pyth_tab,
+            "Pythagoras"
+        )
+
+        pyth_layout = QVBoxLayout()
+
+        self.pyth_tab.setLayout(
+            pyth_layout
+        )
+
+        pyth_layout.addWidget(
+            QLabel(
+                "Side A (Karam)"
+            )
+        )
+
+        self.txt_side_a = QLineEdit()
+
+        pyth_layout.addWidget(
+            self.txt_side_a
+        )
+
+        pyth_layout.addWidget(
+            QLabel(
+                "Side B (Karam)"
+            )
+        )
+
+        self.txt_side_b = QLineEdit()
+
+        pyth_layout.addWidget(
+            self.txt_side_b
+        )
+
+        self.btn_pyth = QPushButton(
+            "Calculate Diagonal"
+        )
+
+        pyth_layout.addWidget(
+            self.btn_pyth
+        )
+
+        self.lbl_pyth_result = QLabel(
+            "Diagonal :"
+        )
+
+        pyth_layout.addWidget(
+            self.lbl_pyth_result
+        )
+
+        self.btn_pyth.clicked.connect(
+            self.calculate_pythagoras
         )
 
         self.setLayout(
-             layout
+            layout
         )
 
     def calculate_rectangle(self):
@@ -119,27 +226,27 @@ class AreaCalculatorDialog(QDialog):
 
             length = float(
                 self.txt_length.text()
-        )
+            )
 
             width = float(
                 self.txt_width.text()
-        )
+            )
 
             sq_karam = (
                 length * width
-        )
+            )
 
             marla = (
                 sq_karam / 9
-        )
+            )
 
             kanal = (
                 marla / 20
-        )
+            )
 
             kms = self.marla_to_kms(
                 marla
-        )
+            )
 
             self.lbl_result.setText(
                 f"Area:\n"
@@ -147,11 +254,77 @@ class AreaCalculatorDialog(QDialog):
                 f"{marla:.2f} Marla\n"
                 f"{kanal:.2f} Kanal\n"
                 f"{kms}"
-        )
+            )
 
         except Exception as e:
 
             print(e)
+
+    def calculate_triangle(self):
+
+        try:
+
+            base = float(
+                self.txt_base.text()
+            )
+
+            height = float(
+                self.txt_height.text()
+            )
+
+            sq_karam = (
+                base * height / 2
+            )
+
+            marla = (
+                sq_karam / 9
+            )
+
+            kanal = (
+                marla / 20
+            )
+
+            kms = self.marla_to_kms(
+                marla
+            )
+
+            self.lbl_triangle_result.setText(
+                f"Area:\n"
+                f"{sq_karam:.2f} Sq Karam\n"
+                f"{marla:.2f} Marla\n"
+                f"{kanal:.2f} Kanal\n"
+                f"{kms}"
+            )
+
+        except Exception as e:
+
+            print(e)
+
+    def calculate_pythagoras(self):
+
+            try:
+
+                side_a = float(
+                    self.txt_side_a.text()
+            )
+
+                side_b = float(
+                    self.txt_side_b.text()
+            )
+
+                diagonal = (
+                    side_a ** 2
+                    + side_b ** 2
+            )   ** 0.5
+
+                self.lbl_pyth_result.setText(
+                    f"Diagonal : "
+                    f"{diagonal:.2f} Karam"
+            )
+
+            except Exception as e:
+
+                print(e)
 
     def marla_to_kms(
         self,

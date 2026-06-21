@@ -48,6 +48,10 @@ from gui.share_calculator_dialog import (
     ShareCalculatorDialog
 )
 
+from gui.area_calculator_dialog import (
+    AreaCalculatorDialog
+)
+
 class KhewatWorkbench(QWidget):
 
     def __init__(self):
@@ -142,6 +146,18 @@ class KhewatWorkbench(QWidget):
         self.btn_share_calc.clicked.connect(
             self.open_share_calculator
         )
+
+        self.btn_area_calc = QPushButton(
+            "Area Calculator"
+        )
+        self.btn_area_calc.clicked.connect(
+            self.open_area_calculator
+        )
+
+        top.addWidget(
+            self.btn_area_calc
+        )
+
         top.addWidget(
             self.btn_edit
         )
@@ -984,7 +1000,13 @@ class KhewatWorkbench(QWidget):
         )
 
         dlg.exec()
+    def open_area_calculator(self):
 
+        dlg = AreaCalculatorDialog(
+            self
+        )
+
+        dlg.exec()
     # =====================================
     # CLOSE
     # =====================================
