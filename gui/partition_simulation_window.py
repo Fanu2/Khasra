@@ -26,6 +26,7 @@ class PartitionSimulationWindow(QMainWindow):
         self.resize(1400, 900)
 
         self.build_ui()
+        self.load_villages()
 
     def build_ui(self):
 
@@ -148,3 +149,23 @@ class PartitionSimulationWindow(QMainWindow):
         main_layout.addLayout(bottom)
 
         self.statusBar().showMessage("Partition Simulation Workbench Ready")
+    
+    def load_villages(self):
+
+        from services.simulation_loader import SimulationLoader
+
+        self.village_combo.clear()
+
+        self.village_combo.addItem(
+            "Select Village",
+            None
+        )
+
+        villages = SimulationLoader.get_villages()
+
+        for village in villages:
+
+            self.village_combo.addItem(
+                village.village_name,
+                village.id
+         )
