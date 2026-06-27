@@ -27,6 +27,7 @@ from gui.partition_register import PartitionRegister
 from gui.khewat_history import KhewatHistory
 from gui.khasra_allocation_wizard import KhasraAllocationWizard
 from gui.khewat_workbench import KhewatWorkbench
+from gui.partition_simulation_window import PartitionSimulationWindow
 
 
 class MainWindow(QMainWindow):
@@ -113,6 +114,19 @@ class MainWindow(QMainWindow):
 
         partition_menu.addAction(full_partition_action)
         partition_menu.addAction(partial_partition_action)
+
+        partition_menu.addSeparator()
+
+        simulation_action = QAction(
+            "Partition Simulation Workbench",
+        self
+        )
+
+        partition_menu.addAction(simulation_action)
+
+        simulation_action.triggered.connect(
+            self.open_partition_simulation
+        )
 
         register_action = QAction(
             "Partition Register",
@@ -679,6 +693,23 @@ class MainWindow(QMainWindow):
             "Workbench Error",
             str(e)
         )
+    def open_partition_simulation(self):
+
+        try:
+
+            self.simulation_window = (
+                PartitionSimulationWindow()
+            )
+
+            self.simulation_window.show()
+
+        except Exception as e:
+
+            QMessageBox.critical(
+                self,
+                "Simulation Error",
+                str(e)
+            )
 
     def undo_last_allocation(self):
 
