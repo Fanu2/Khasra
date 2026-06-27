@@ -34,6 +34,10 @@ class ParcelItem(QGraphicsRectItem):
         self.owner_name = owner_name
         self.area = area
 
+        # Will be assigned by PartitionSimulationWindow
+        self.khewat_id = None
+        self.main_window = None
+
         self.default_brush = QBrush(color)
         self.selected_brush = QBrush(QColor("yellow"))
 
@@ -50,16 +54,13 @@ class ParcelItem(QGraphicsRectItem):
 
         self.setAcceptHoverEvents(True)
 
-        # <-- ADD THIS HERE
         self.setToolTip(
             f"Khasra : {self.khasra_no}\n"
-            f"Owner  : {self.owner_name}\n"
             f"Area   : {self.area}"
         )
 
     def hoverEnterEvent(self, event):
-    # Future: update status bar or owner panel
-    
+        # Future: update status bar or owner panel
         super().hoverEnterEvent(event)
 
     def itemChange(self, change, value):
@@ -67,16 +68,22 @@ class ParcelItem(QGraphicsRectItem):
         if change == QGraphicsItem.GraphicsItemChange.ItemSelectedHasChanged:
 
             if self.isSelected():
+
                 self.setBrush(self.selected_brush)
-                if hasattr(self, "main_window"):
+
+                if (
+                    self.main_window is not None
+                    and self.khewat_id is not None
+                ):
 
                     self.main_window.update_information_panel(
-                    self.khasra_no,
-                    self.area,
-                    self.owner_name
-        )
+                        self.khasra_no,
+                        self.area,
+                        self.khewat_id
+                    )
+
             else:
+
                 self.setBrush(self.default_brush)
 
         return super().itemChange(change, value)
-    

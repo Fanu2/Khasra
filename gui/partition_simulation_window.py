@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
     QGraphicsScene,
     QFrame
 )
-
+from services.ownership_lookup import OwnershipLookup
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QBrush, QColor, QPen
 
@@ -91,23 +91,25 @@ class PartitionSimulationWindow(QMainWindow):
         
 
         title = QLabel("Parcel Information")
-        title.setStyleSheet(
-            "font-size:16px;font-weight:bold;"
-        )
+        title.setStyleSheet("font-size:16px;font-weight:bold;")
 
         right.addWidget(title)
 
         self.lbl_khasra = QLabel("Khasra No :")
         self.lbl_area = QLabel("Area :")
-        self.lbl_owner = QLabel("Owner :")
-        self.lbl_share = QLabel("Share :")
         self.lbl_remarks = QLabel("Remarks :")
 
         right.addWidget(self.lbl_khasra)
         right.addWidget(self.lbl_area)
-        right.addWidget(self.lbl_owner)
-        right.addWidget(self.lbl_share)
+
+        right.addWidget(QLabel("Joint Owners"))
+
+        self.owner_list = QListWidget()
+        right.addWidget(self.owner_list)
+
         right.addWidget(self.lbl_remarks)
+
+        
 
         right.addStretch()
         middle.addLayout(right, 1)
@@ -246,8 +248,12 @@ class PartitionSimulationWindow(QMainWindow):
                 w=w,
                 h=h,
                 color=colors[i % len(colors)]
-        )
+            )
+        
+
             parcel.main_window = self
+            parcel.khewat_id = self.khewat_combo.currentData()
+
             self.scene.addItem(parcel)
 
             label = self.scene.addText(f"Parcel {i+1}")
@@ -281,7 +287,8 @@ class PartitionSimulationWindow(QMainWindow):
                 h=80,
                 color=colors[i % len(colors)]
             )
-
+            parcel.main_window = self
+            parcel.khewat_id = self.khewat_combo.currentData()
             self.scene.addItem(parcel)
 
             label = self.scene.addText(
@@ -295,13 +302,11 @@ class PartitionSimulationWindow(QMainWindow):
             if x > 700:
                 x = 40
                 y += 110
-
     def update_information_panel(
         self,
         khasra_no,
         area,
-        owner="",
-        share="",
+        khewat_id,
         remarks=""
         ):
 
@@ -310,17 +315,19 @@ class PartitionSimulationWindow(QMainWindow):
         )
 
         self.lbl_area.setText(
-            f"Area : {area}"
-        )
-
-        self.lbl_owner.setText(
-            f"Owner : {owner}"
-        )
-
-        self.lbl_share.setText(
-            f"Share : {share}"
+                f"Area : {area}"
         )
 
         self.lbl_remarks.setText(
-            f"Remarks : {remarks}"
-    )
+                f"Remarks : {remarks}"
+        )
+
+        self.owner_list.clear()
+
+        owners = OwnershipLookup.get_joint_owners(khewat_id)
+
+        for ownership in owners:
+
+            self.owner_list.addItem(
+                 f"{ownership.owner.owner_name} ({ownership.share_text})"
+        )
