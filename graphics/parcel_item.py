@@ -58,13 +58,8 @@ class ParcelItem(QGraphicsRectItem):
         )
 
     def hoverEnterEvent(self, event):
-
-        print(
-            self.khasra_no,
-            self.owner_name,
-            self.area
-        )
-
+    # Future: update status bar or owner panel
+    
         super().hoverEnterEvent(event)
 
     def itemChange(self, change, value):
