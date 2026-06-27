@@ -79,8 +79,6 @@ class PartitionSimulationWindow(QMainWindow):
 
         self.scene = QGraphicsScene()
 
-        
-        self.scene = QGraphicsScene()
 
         self.view = QGraphicsView(self.scene)
         self.view.setFrameShape(QFrame.Box)
@@ -90,17 +88,28 @@ class PartitionSimulationWindow(QMainWindow):
         # Right panel
 
         right = QVBoxLayout()
+        
 
-        right.addWidget(QLabel("Owners"))
+        title = QLabel("Parcel Information")
+        title.setStyleSheet(
+            "font-size:16px;font-weight:bold;"
+        )
 
-        self.owner_list = QListWidget()
-        right.addWidget(self.owner_list)
+        right.addWidget(title)
 
-        right.addWidget(QLabel("Allocation Summary"))
+        self.lbl_khasra = QLabel("Khasra No :")
+        self.lbl_area = QLabel("Area :")
+        self.lbl_owner = QLabel("Owner :")
+        self.lbl_share = QLabel("Share :")
+        self.lbl_remarks = QLabel("Remarks :")
 
-        self.summary = QListWidget()
-        right.addWidget(self.summary)
+        right.addWidget(self.lbl_khasra)
+        right.addWidget(self.lbl_area)
+        right.addWidget(self.lbl_owner)
+        right.addWidget(self.lbl_share)
+        right.addWidget(self.lbl_remarks)
 
+        right.addStretch()
         middle.addLayout(right, 1)
 
         main_layout.addLayout(middle)
@@ -146,7 +155,11 @@ class PartitionSimulationWindow(QMainWindow):
 
         village_id = self.village_combo.currentData()
 
-        print(f"Village selected: {village_id}")
+        village_name = self.village_combo.currentText()
+
+        self.statusBar().showMessage(
+            f"Village selected: {village_name}"
+        )
 
         if village_id is None:
 
@@ -169,7 +182,9 @@ class PartitionSimulationWindow(QMainWindow):
 
         khewats = SimulationLoader.get_khewats(village_id)
 
-        print(f"Khewats returned: {len(khewats)}")
+        self.statusBar().showMessage(
+            f"Loaded {len(khewats)} Khewats"
+        )
 
         for khewat in khewats:
 
@@ -182,7 +197,9 @@ class PartitionSimulationWindow(QMainWindow):
         khewat_id = self.khewat_combo.currentData()
 
         if khewat_id is None:
-            return
+         return
+
+        print(f"Khewat selected: {khewat_id}")
 
         self.load_khasras(khewat_id)
 
@@ -191,6 +208,7 @@ class PartitionSimulationWindow(QMainWindow):
         from services.simulation_loader import SimulationLoader
 
         khasras = SimulationLoader.get_khasras(khewat_id)
+        print(f"Khasras found: {len(khasras)}")
 
         self.load_real_parcels(khasras)
 
@@ -229,7 +247,7 @@ class PartitionSimulationWindow(QMainWindow):
                 h=h,
                 color=colors[i % len(colors)]
         )
-
+            parcel.main_window = self
             self.scene.addItem(parcel)
 
             label = self.scene.addText(f"Parcel {i+1}")
@@ -277,3 +295,32 @@ class PartitionSimulationWindow(QMainWindow):
             if x > 700:
                 x = 40
                 y += 110
+
+    def update_information_panel(
+        self,
+        khasra_no,
+        area,
+        owner="",
+        share="",
+        remarks=""
+        ):
+
+        self.lbl_khasra.setText(
+            f"Khasra No : {khasra_no}"
+        )
+
+        self.lbl_area.setText(
+            f"Area : {area}"
+        )
+
+        self.lbl_owner.setText(
+            f"Owner : {owner}"
+        )
+
+        self.lbl_share.setText(
+            f"Share : {share}"
+        )
+
+        self.lbl_remarks.setText(
+            f"Remarks : {remarks}"
+    )

@@ -68,6 +68,13 @@ class ParcelItem(QGraphicsRectItem):
 
             if self.isSelected():
                 self.setBrush(self.selected_brush)
+                if hasattr(self, "main_window"):
+
+                    self.main_window.update_information_panel(
+                    self.khasra_no,
+                    self.area,
+                    self.owner_name
+        )
             else:
                 self.setBrush(self.default_brush)
 
