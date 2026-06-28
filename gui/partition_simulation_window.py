@@ -18,6 +18,7 @@ from PySide6.QtGui import QBrush, QColor, QPen
 from services.allocation_engine import AllocationEngine
 from gui.validation_dialog import ValidationDialog
 from services.validation_engine import ValidationEngine
+from gui.owner_summary_widget import OwnerSummaryWidget
 
 class PartitionSimulationWindow(QMainWindow):
 
@@ -139,28 +140,29 @@ class PartitionSimulationWindow(QMainWindow):
 # -------------------------
 # Current Allocation
 # -------------------------
-
         right.addWidget(QLabel("Current Allocation"))
 
         self.allocation_list = QListWidget()
         right.addWidget(self.allocation_list)
 
-# -------------------------
+        # -------------------------
+        # Parcel Information
+        # -------------------------
 
         right.addWidget(self.lbl_remarks)
 
-        right.addStretch()
+        # -------------------------
+        # Owner Summary
+        # -------------------------
 
-# -------------------------
-
-        right.addWidget(self.lbl_remarks)
+        self.owner_summary = OwnerSummaryWidget()
+        right.addWidget(self.owner_summary)
 
         right.addStretch()
 
         middle.addLayout(right, 1)
 
         main_layout.addLayout(middle)
-
         # -----------------------------
         # Bottom buttons
         # -----------------------------
@@ -512,7 +514,9 @@ class PartitionSimulationWindow(QMainWindow):
             self.current_khewat,
             allocations
         )
-
+        
+        self.last_validation_results = results
+        
         dialog = ValidationDialog(
             results,
             self
@@ -529,8 +533,36 @@ class PartitionSimulationWindow(QMainWindow):
 
     def highlight_owner(self, owner_id):
 
+        selected_owner = None
+        parcels = []
+
+    # Highlight parcels and collect parcel numbers
         for item in self.scene.items():
 
             if isinstance(item, ParcelItem):
 
                 item.highlight(owner_id)
+
+                if item.owner_id == owner_id:
+                    parcels.append(str(item.khasra_no))
+
+    # Find owner details from the last validation results
+        if hasattr(self, "last_validation_results"):
+
+            for owner in self.last_validation_results:
+
+                if owner["owner_id"] == owner_id:
+                    selected_owner = owner
+                    break
+
+    # Update Owner Summary
+        if selected_owner:
+
+            self.owner_summary.set_owner(
+                owner_name=selected_owner["owner_name"],
+                share=selected_owner["share"],
+                required=selected_owner["required_area"],
+                allocated=selected_owner["allocated_area"],
+                difference=selected_owner["difference"],
+                parcels=parcels
+        )
