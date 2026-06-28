@@ -15,13 +15,17 @@ from PySide6.QtWidgets import (
 from services.ownership_lookup import OwnershipLookup
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QBrush, QColor, QPen
-
+from services.allocation_engine import AllocationEngine
+from gui.validation_dialog import ValidationDialog
+from services.validation_engine import ValidationEngine
 
 class PartitionSimulationWindow(QMainWindow):
 
 
     def __init__(self):
         super().__init__()
+
+        self.engine = AllocationEngine()
 
         self.setWindowTitle("Partition Simulation Workbench")
         self.resize(1400, 900)
@@ -36,6 +40,17 @@ class PartitionSimulationWindow(QMainWindow):
         self.khewat_combo.currentIndexChanged.connect(
         self.on_khewat_changed
         )
+
+        self.allocate_button.clicked.connect(
+        self.allocate_selected_parcel
+        )
+
+        self.validate_button.clicked.connect(
+        self.validate_partition
+        )
+
+        self.current_parcel = None
+        self.current_khewat = None
 
     def build_ui(self):
 
@@ -88,11 +103,9 @@ class PartitionSimulationWindow(QMainWindow):
         # Right panel
 
         right = QVBoxLayout()
-        
 
         title = QLabel("Parcel Information")
         title.setStyleSheet("font-size:16px;font-weight:bold;")
-
         right.addWidget(title)
 
         self.lbl_khasra = QLabel("Khasra No :")
@@ -102,16 +115,48 @@ class PartitionSimulationWindow(QMainWindow):
         right.addWidget(self.lbl_khasra)
         right.addWidget(self.lbl_area)
 
+# -------------------------
+# Joint Owners
+# -------------------------
+
         right.addWidget(QLabel("Joint Owners"))
 
         self.owner_list = QListWidget()
         right.addWidget(self.owner_list)
 
+# -------------------------
+# Allocate To
+# -------------------------
+
+        right.addWidget(QLabel("Allocate To"))
+
+        self.owner_combo = QComboBox()
+        right.addWidget(self.owner_combo)
+
+        self.allocate_button = QPushButton("Allocate Selected Parcel")
+        right.addWidget(self.allocate_button)
+
+# -------------------------
+# Current Allocation
+# -------------------------
+
+        right.addWidget(QLabel("Current Allocation"))
+
+        self.allocation_list = QListWidget()
+        right.addWidget(self.allocation_list)
+
+# -------------------------
+
         right.addWidget(self.lbl_remarks)
 
-        
+        right.addStretch()
+
+# -------------------------
+
+        right.addWidget(self.lbl_remarks)
 
         right.addStretch()
+
         middle.addLayout(right, 1)
 
         main_layout.addLayout(middle)
@@ -125,7 +170,8 @@ class PartitionSimulationWindow(QMainWindow):
         bottom.addStretch()
 
         bottom.addWidget(QPushButton("Load"))
-        bottom.addWidget(QPushButton("Validate"))
+        self.validate_button = QPushButton("Validate")
+        bottom.addWidget(self.validate_button)
         bottom.addWidget(QPushButton("Commit"))
         bottom.addWidget(QPushButton("Close"))
 
@@ -302,32 +348,154 @@ class PartitionSimulationWindow(QMainWindow):
             if x > 700:
                 x = 40
                 y += 110
+    ...
+    def allocate_selected_parcel(self):
+
+        selected = self.scene.selectedItems()
+
+        if not selected:
+            return
+
+        parcel = selected[0]
+
+        owner_id = self.owner_combo.currentData()
+
+        if owner_id is None:
+            return
+
+    # Store allocation
+        self.engine.allocate(
+            parcel.parcel_id,
+            owner_id
+        )
+
+    # Owner colours
+        owner_colors = [
+            QColor("#4CAF50"),   # Green
+            QColor("#2196F3"),   # Blue
+            QColor("#FF9800"),   # Orange
+            QColor("#9C27B0"),   # Purple
+            QColor("#F44336"),   # Red
+            QColor("#009688"),   # Teal
+            QColor("#795548"),   # Brown
+            QColor("#607D8B"),   # Blue Grey
+        ]
+
+        color = owner_colors[
+            (owner_id - 1) % len(owner_colors)
+        ]
+
+        parcel.set_owner_color(color)
+
+    # Refresh allocation display
+        self.refresh_allocation_panel()
+
+        self.statusBar().showMessage(
+            "Parcel allocated successfully."
+        )
+
+        print()
+        print("===== CURRENT ALLOCATIONS =====")
+
+        for parcel_id, owner in self.engine.get_all_allocations().items():
+            print(f"Parcel {parcel_id} -> Owner {owner}")
+
+        print("===============================")
+    def refresh_allocation_panel(self):
+
+        self.allocation_list.clear()
+
+        allocations = self.engine.get_all_allocations()
+
+        for parcel_id, owner_id in allocations.items():
+
+            owner_name = self.owner_lookup.get(
+                owner_id,
+                f"Owner {owner_id}"
+            )
+
+            self.allocation_list.addItem(
+                f"Parcel {parcel_id} → {owner_name}"
+            )
+
     def update_information_panel(
         self,
         khasra_no,
         area,
         khewat_id,
         remarks=""
-        ):
+    ):
+
+        self.current_parcel = khasra_no
+        self.current_khewat = khewat_id
 
         self.lbl_khasra.setText(
             f"Khasra No : {khasra_no}"
         )
 
         self.lbl_area.setText(
-                f"Area : {area}"
+            f"Area : {area}"
         )
 
         self.lbl_remarks.setText(
-                f"Remarks : {remarks}"
+            f"Remarks : {remarks}"
         )
 
+    # Clear previous information
         self.owner_list.clear()
+        self.owner_combo.clear()
 
+    # Reset owner lookup dictionary
+        self.owner_lookup = {}
+
+    # Load owners for this khewat
         owners = OwnershipLookup.get_joint_owners(khewat_id)
 
         for ownership in owners:
 
+            owner = ownership.owner
+
+            self.owner_lookup[owner.id] = owner.owner_name
+
+        # Joint Owners panel
             self.owner_list.addItem(
-                 f"{ownership.owner.owner_name} ({ownership.share_text})"
+                f"{owner.owner_name} ({ownership.share_text})"
+            )
+
+        # Allocate To combo
+            self.owner_combo.addItem(
+                owner.owner_name,
+                owner.id
+            )
+
+    # Refresh allocation display using owner names
+        self.refresh_allocation_panel()
+    def validate_partition(self):
+
+        if self.current_khewat is None:
+
+            self.statusBar().showMessage(
+                "Please select a parcel first."
+            )
+            return
+
+        allocations = self.engine.get_all_allocations()
+
+        if not allocations:
+
+            self.statusBar().showMessage(
+                "No parcel allocations found."
+            )
+            return
+
+        results = ValidationEngine.validate_allocations(
+            self.current_khewat,
+            allocations
         )
+
+        dialog = ValidationDialog(
+            results,
+            self
+        )
+
+        dialog.exec()

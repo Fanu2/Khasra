@@ -87,3 +87,14 @@ class ParcelItem(QGraphicsRectItem):
                 self.setBrush(self.default_brush)
 
         return super().itemChange(change, value)
+    
+    def set_owner_color(self, color):
+
+        self.default_brush = QBrush(color)
+
+        if not self.isSelected():
+            self.setBrush(self.default_brush)
+        else:
+
+    # Restore the parcel's current owner colour
+            self.setBrush(self.default_brush)
