@@ -32,7 +32,9 @@ class ParcelItem(QGraphicsRectItem):
         self.parcel_id = parcel_id
         self.khasra_no = khasra_no
         self.owner_name = owner_name
+        self.owner_id = None
         self.area = area
+        
 
         # Will be assigned by PartitionSimulationWindow
         self.khewat_id = None
@@ -98,3 +100,19 @@ class ParcelItem(QGraphicsRectItem):
 
     # Restore the parcel's current owner colour
             self.setBrush(self.default_brush)
+    def highlight(self, active_owner_id):
+
+
+        if self.owner_id == active_owner_id:
+
+            print("MATCH")
+
+            pen = QPen(QColor("red"))
+            pen.setWidth(4)
+            self.setPen(pen)
+
+        else:
+
+            pen = QPen(QColor("lightgray"))
+            pen.setWidth(1)
+            self.setPen(pen)

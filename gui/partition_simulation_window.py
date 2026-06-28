@@ -308,6 +308,9 @@ class PartitionSimulationWindow(QMainWindow):
 
         self.scene.clear()
 
+    # Get all current parcel allocations
+        allocations = self.engine.get_all_allocations()
+
         colors = [
             QColor("#F4A261"),
             QColor("#2A9D8F"),
@@ -333,8 +336,13 @@ class PartitionSimulationWindow(QMainWindow):
                 h=80,
                 color=colors[i % len(colors)]
             )
+
             parcel.main_window = self
             parcel.khewat_id = self.khewat_combo.currentData()
+
+        # Restore owner allocation for this parcel
+            parcel.owner_id = allocations.get(khasra.id)
+
             self.scene.addItem(parcel)
 
             label = self.scene.addText(
@@ -368,6 +376,17 @@ class PartitionSimulationWindow(QMainWindow):
             parcel.parcel_id,
             owner_id
         )
+        parcel.owner_id = owner_id
+        
+        # Store the owner inside the parcel object
+        parcel.owner_id = owner_id
+
+        self.refresh_allocation_panel()
+
+        self.statusBar().showMessage(
+            "Parcel allocated successfully."
+        )
+        
 
     # Owner colours
         owner_colors = [
@@ -467,6 +486,7 @@ class PartitionSimulationWindow(QMainWindow):
                 owner.owner_name,
                 owner.id
             )
+        self.view.viewport().update()   # if your QGraphicsView is named self.view
 
     # Refresh allocation display using owner names
         self.refresh_allocation_panel()
@@ -498,4 +518,19 @@ class PartitionSimulationWindow(QMainWindow):
             self
         )
 
+       
+
+    # Connect the signal BEFORE showing the dialog
+        dialog.ownerSelected.connect(
+            self.highlight_owner
+        )
+
         dialog.exec()
+
+    def highlight_owner(self, owner_id):
+
+        for item in self.scene.items():
+
+            if isinstance(item, ParcelItem):
+
+                item.highlight(owner_id)

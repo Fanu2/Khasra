@@ -48,6 +48,7 @@ class ValidationEngine:
 
                 })
 
+
             return results
 
         finally:
@@ -97,6 +98,7 @@ class ValidationEngine:
 
                 results.append({
 
+                    "owner_id": owner["owner_id"],
                     "owner_name": owner["owner_name"],
                     "share": owner["share"],
                     "required_area": owner["required_area"],
@@ -104,7 +106,9 @@ class ValidationEngine:
                     "difference": difference,
                     "status": status
 
-                })
+                    })
+
+                
 
             return results
 

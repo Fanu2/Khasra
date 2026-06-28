@@ -10,13 +10,15 @@ from PySide6.QtWidgets import (
 )
 
 from PySide6.QtGui import QColor
-from PySide6.QtCore import Qt
-
+from PySide6.QtCore import Qt, Signal
 
 class ValidationDialog(QDialog):
-
+    
+    ownerSelected = Signal(int)
     def __init__(self, results, parent=None):
         super().__init__(parent)
+
+        self.results = results
 
         self.setWindowTitle("Allocation Validation Report")
         self.resize(950, 550)
@@ -31,6 +33,14 @@ class ValidationDialog(QDialog):
         layout.addWidget(title)
 
         self.table = QTableWidget()
+
+        self.table.setSelectionBehavior(
+        QTableWidget.SelectRows
+        )
+
+        self.table.setSelectionMode(
+        QTableWidget.SingleSelection
+        )
 
         self.table.setColumnCount(6)
 
@@ -152,9 +162,17 @@ class ValidationDialog(QDialog):
 
         buttons.addStretch()
 
+        self.table.cellClicked.connect(
+        self.row_clicked
+        )
         close_button = QPushButton("Close")
         close_button.clicked.connect(self.accept)
 
         buttons.addWidget(close_button)
 
         layout.addLayout(buttons)
+    def row_clicked(self, row, column):
+
+        owner_id = self.results[row]["owner_id"]
+
+        self.ownerSelected.emit(owner_id)
