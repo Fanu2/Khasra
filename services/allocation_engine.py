@@ -47,3 +47,7 @@ class AllocationEngine:
 
         if parcel_id in self.allocations:
             del self.allocations[parcel_id]
+
+    def set_allocations(self, allocations):
+
+        self.allocations = allocations.copy()

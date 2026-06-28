@@ -53,6 +53,14 @@ class PartitionSimulationWindow(QMainWindow):
         self.remove_selected_parcel
         )
 
+        self.save_sim_button.clicked.connect(
+        self.save_simulation
+        )
+
+        self.load_sim_button.clicked.connect(
+        self.load_simulation
+        )
+
         self.validate_button.clicked.connect(
         self.validate_partition
         )
@@ -164,6 +172,25 @@ class PartitionSimulationWindow(QMainWindow):
         # -------------------------
 
         right.addWidget(self.lbl_remarks)
+
+        # -------------------------
+# Simulation
+# -------------------------
+
+        right.addSpacing(10)
+
+        right.addWidget(QLabel("Simulation"))
+
+        self.save_sim_button = QPushButton(
+            "Save Simulation"
+        )
+
+        self.load_sim_button = QPushButton(
+            "Load Simulation"
+        )
+
+        right.addWidget(self.save_sim_button)
+        right.addWidget(self.load_sim_button)
 
         # -------------------------
         # Owner Summary
@@ -473,6 +500,52 @@ class PartitionSimulationWindow(QMainWindow):
         self.statusBar().showMessage(
             "Parcel unallocated successfully."
         )
+
+    def save_simulation(self):
+
+        SimulationStorage.save_simulation(
+
+            "Test1",
+
+            self.current_khewat,
+
+            self.engine.get_all_allocations()
+
+        )
+
+        self.statusBar().showMessage(
+            "Simulation saved successfully."
+        )
+
+    def load_simulation(self):
+
+        allocations = SimulationStorage.load_simulation(
+            "Test1"
+        )
+
+        if not allocations:
+
+            self.statusBar().showMessage(
+                "No saved simulation found."
+            )
+            return
+
+    # Restore AllocationEngine
+        self.engine.set_allocations(
+            allocations
+        )
+
+    # Reload parcels of the current khewat
+        self.load_khasras(
+            self.current_khewat
+        )
+
+    # Refresh Current Allocation panel
+        self.refresh_allocation_panel()
+
+        self.statusBar().showMessage(
+        "Simulation loaded successfully."
+    )
     
     def refresh_allocation_panel(self):
 
@@ -601,36 +674,7 @@ class PartitionSimulationWindow(QMainWindow):
 
         dialog.exec()
 
-    # Temporary test: save the current simulation
-        try:
 
-            SimulationStorage.save_simulation(
-                "Test1",
-            self.current_khewat,
-            allocations
-            )
-
-            print("=" * 50)
-            print("Simulation saved successfully.")
-            print(f"Simulation : Test1")
-            print(f"Khewat ID  : {self.current_khewat}")
-            print(f"Allocations: {len(allocations)}")
-            print("=" * 50)
-
-            loaded = SimulationStorage.load_simulation("Test1")
-
-            print("=" * 50)
-            print("Loaded Simulation")
-            print(loaded)
-            print("=" * 50)
-
-        except Exception as e:
-
-            print("=" * 50)
-            print("SAVE FAILED")
-            print(type(e).__name__)
-            print(e)
-            print("=" * 50)
 
     def highlight_owner(self, owner_id):
 
