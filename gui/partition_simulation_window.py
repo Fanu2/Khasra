@@ -19,6 +19,9 @@ from services.allocation_engine import AllocationEngine
 from gui.validation_dialog import ValidationDialog
 from services.validation_engine import ValidationEngine
 from gui.owner_summary_widget import OwnerSummaryWidget
+from database.db import SessionLocal
+from database.models import Khasra, Owner
+from services.simulation_storage import SimulationStorage
 
 class PartitionSimulationWindow(QMainWindow):
 
@@ -44,6 +47,10 @@ class PartitionSimulationWindow(QMainWindow):
 
         self.allocate_button.clicked.connect(
         self.allocate_selected_parcel
+        )
+
+        self.remove_button.clicked.connect(
+        self.remove_selected_parcel
         )
 
         self.validate_button.clicked.connect(
@@ -138,13 +145,20 @@ class PartitionSimulationWindow(QMainWindow):
         right.addWidget(self.allocate_button)
 
 # -------------------------
+# Unallocate
+# -------------------------
+
+        self.remove_button = QPushButton("Unallocate Parcel")
+        right.addWidget(self.remove_button)
+
+# -------------------------
 # Current Allocation
 # -------------------------
+
         right.addWidget(QLabel("Current Allocation"))
 
         self.allocation_list = QListWidget()
         right.addWidget(self.allocation_list)
-
         # -------------------------
         # Parcel Information
         # -------------------------
@@ -422,22 +436,78 @@ class PartitionSimulationWindow(QMainWindow):
             print(f"Parcel {parcel_id} -> Owner {owner}")
 
         print("===============================")
+    
+    def remove_selected_parcel(self):
+
+        selected = self.scene.selectedItems()
+
+        if not selected:
+
+            self.statusBar().showMessage(
+                "Please select a parcel."
+            )
+            return
+
+        parcel = selected[0]
+
+    # Remove allocation from the engine
+        self.engine.remove(parcel.parcel_id)
+
+    # Remove owner from the parcel
+        parcel.owner_id = None
+
+    # Restore unallocated colour
+        parcel.set_owner_color(
+            QColor("#D3D3D3")
+        )
+
+    # Refresh allocation list
+        self.refresh_allocation_panel()
+
+    # Clear owner summary
+        self.owner_summary.clear()
+
+    # Clear owner selection
+        self.owner_combo.setCurrentIndex(-1)
+
+        self.statusBar().showMessage(
+            "Parcel unallocated successfully."
+        )
+    
     def refresh_allocation_panel(self):
 
         self.allocation_list.clear()
 
         allocations = self.engine.get_all_allocations()
 
-        for parcel_id, owner_id in allocations.items():
+        session = SessionLocal()
 
-            owner_name = self.owner_lookup.get(
-                owner_id,
-                f"Owner {owner_id}"
-            )
+        try:
 
-            self.allocation_list.addItem(
-                f"Parcel {parcel_id} → {owner_name}"
-            )
+            for parcel_id, owner_id in allocations.items():
+
+                khasra = session.get(Khasra, parcel_id)
+                owner = session.get(Owner, owner_id)
+
+                khasra_text = (
+                    f"{khasra.khasra_no} (ID {parcel_id})"
+                    if khasra else
+                    f"Parcel {parcel_id}"
+                )
+
+                owner_text = (
+                    f"{owner.owner_name} (ID {owner_id})"
+                    if owner else
+                    f"Owner {owner_id}"
+                )
+
+                self.allocation_list.addItem(
+                    f"{khasra_text}  →  {owner_text}"
+                )
+
+        finally:
+
+            session.close()
 
     def update_information_panel(
         self,
@@ -492,6 +562,7 @@ class PartitionSimulationWindow(QMainWindow):
 
     # Refresh allocation display using owner names
         self.refresh_allocation_panel()
+    
     def validate_partition(self):
 
         if self.current_khewat is None:
@@ -510,26 +581,56 @@ class PartitionSimulationWindow(QMainWindow):
             )
             return
 
+    # Validate allocations
         results = ValidationEngine.validate_allocations(
             self.current_khewat,
             allocations
         )
-        
+
         self.last_validation_results = results
-        
+
+    # Show validation dialog
         dialog = ValidationDialog(
             results,
             self
         )
 
-       
-
-    # Connect the signal BEFORE showing the dialog
         dialog.ownerSelected.connect(
             self.highlight_owner
         )
 
         dialog.exec()
+
+    # Temporary test: save the current simulation
+        try:
+
+            SimulationStorage.save_simulation(
+                "Test1",
+            self.current_khewat,
+            allocations
+            )
+
+            print("=" * 50)
+            print("Simulation saved successfully.")
+            print(f"Simulation : Test1")
+            print(f"Khewat ID  : {self.current_khewat}")
+            print(f"Allocations: {len(allocations)}")
+            print("=" * 50)
+
+            loaded = SimulationStorage.load_simulation("Test1")
+
+            print("=" * 50)
+            print("Loaded Simulation")
+            print(loaded)
+            print("=" * 50)
+
+        except Exception as e:
+
+            print("=" * 50)
+            print("SAVE FAILED")
+            print(type(e).__name__)
+            print(e)
+            print("=" * 50)
 
     def highlight_owner(self, owner_id):
 

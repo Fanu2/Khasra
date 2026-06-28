@@ -420,3 +420,36 @@ class KhasraHistory(Base):
     new_area = Column(Float)
     remarks = Column(Text)
     created_on = Column(DateTime, default=datetime.utcnow)
+class SimulationAllocation(Base):
+
+    __tablename__ = "simulation_allocations"
+
+    id = Column(
+        Integer,
+        primary_key=True
+    )
+
+    simulation_name = Column(
+        String,
+        nullable=False
+    )
+
+    khewat_id = Column(
+        Integer,
+        nullable=False
+    )
+
+    parcel_id = Column(
+        Integer,
+        nullable=False
+    )
+
+    owner_id = Column(
+        Integer,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )

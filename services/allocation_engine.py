@@ -38,3 +38,12 @@ class AllocationEngine:
     def allocation_count(self):
         """Return number of allocated parcels."""
         return len(self.allocations)
+    
+    def remove(self, parcel_id):
+
+        """
+        Remove an allocation for a parcel.
+        """
+
+        if parcel_id in self.allocations:
+            del self.allocations[parcel_id]
