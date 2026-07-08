@@ -1,0 +1,11 @@
+README.md
+pyproject.toml
+src/hpm.egg-info/PKG-INFO
+src/hpm.egg-info/SOURCES.txt
+src/hpm.egg-info/dependency_links.txt
+src/hpm.egg-info/requires.txt
+src/hpm.egg-info/top_level.txt
+src/hpm/application/application.py
+src/hpm/application/application_context.py
+src/hpm/presentation/main_window.py
+src/hpm/presentation/dashboard/dashboard_widget.py
