@@ -6,6 +6,8 @@ Application workspace.
 
 from __future__ import annotations
 
+from PySide6.QtWidgets import QStackedWidget
+
 from hpm.application.application_context import (
     ApplicationContext,
 )
@@ -16,12 +18,12 @@ from hpm.presentation.dashboard.dashboard_page import (
     DashboardPage,
 )
 
-from PySide6.QtWidgets import QStackedWidget
-
 
 class Workspace(QStackedWidget):
     """
     Main application workspace.
+
+    Owns and manages the application's top-level pages.
     """
 
     def __init__(
@@ -29,6 +31,9 @@ class Workspace(QStackedWidget):
         context: ApplicationContext,
         parent=None,
     ) -> None:
+        """
+        Initialize the workspace.
+        """
 
         super().__init__(parent)
 
@@ -54,7 +59,9 @@ class Workspace(QStackedWidget):
 
         self._add_page(
             "Partition Cases",
-            CaseBrowserPage(),
+            CaseBrowserPage(
+                self._context,
+            ),
         )
 
     def _add_page(
@@ -63,30 +70,24 @@ class Workspace(QStackedWidget):
         page,
     ) -> None:
         """
-        Register a page.
+        Add a page to the workspace.
         """
 
-        index = self.addWidget(
+        self._pages[name] = self.addWidget(
             page,
         )
-
-        self._pages[name] = index
 
     def show_page(
         self,
         name: str,
     ) -> None:
         """
-        Display a page.
+        Display the requested page.
         """
 
-        index = self._pages.get(
-            name,
-        )
-
-        if index is None:
+        if name not in self._pages:
             return
 
         self.setCurrentIndex(
-            index,
+            self._pages[name],
         )

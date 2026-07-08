@@ -4,23 +4,32 @@ Haryana Partition Manager (HPM)
 Application context.
 
 The ApplicationContext is the composition root of the application.
-It owns long-lived services and exposes shared application resources
-to the presentation layer.
+It owns long-lived services and exposes shared resources to the
+presentation layer.
 """
 
 from __future__ import annotations
 
+from hpm.application.services.partition_case_service import (
+    PartitionCaseService,
+)
 from hpm.configuration.settings import Settings
 from hpm.configuration.settings_service import SettingsService
+from hpm.infrastructure.persistence.sqlite.database import (
+    SessionFactory,
+    initialize_database,
+)
+from hpm.infrastructure.persistence.sqlite.repositories.sqlite_partition_case_repository import (
+    SqlitePartitionCaseRepository,
+)
 
 
 class ApplicationContext:
     """
     Shared application context.
 
-    This class is responsible for creating and managing application-wide
-    services. Presentation components should obtain shared services
-    through this class instead of constructing them directly.
+    Responsible for constructing and exposing all application-wide
+    services.
     """
 
     def __init__(
@@ -31,33 +40,47 @@ class ApplicationContext:
         """
 
         #
-        # Core Services
+        # Configuration
         #
 
         self._settings_service = SettingsService()
 
         #
-        # Future Services
-        #
-        # These will be registered as they are implemented.
-        #
-        # self._database = ...
-        # self._partition_case_service = ...
-        # self._logging_service = ...
-        # self._report_service = ...
+        # Database
         #
 
+        initialize_database()
+
+        self._session = SessionFactory()
+
+        #
+        # Repositories
+        #
+
+        self._partition_case_repository = (
+            SqlitePartitionCaseRepository(
+                self._session,
+            )
+        )
+
+        #
+        # Application Services
+        #
+
+        self._partition_case_service = (
+            PartitionCaseService(
+                self._partition_case_repository,
+            )
+        )
+
     # ------------------------------------------------------------------
-    # Core Services
+    # Configuration
     # ------------------------------------------------------------------
 
     @property
     def settings_service(
         self,
     ) -> SettingsService:
-        """
-        Return the application settings service.
-        """
 
         return self._settings_service
 
@@ -65,23 +88,31 @@ class ApplicationContext:
     def settings(
         self,
     ) -> Settings:
-        """
-        Return the current application settings.
-        """
 
         return self._settings_service.settings
 
     # ------------------------------------------------------------------
-    # Application Metadata
+    # Services
+    # ------------------------------------------------------------------
+
+    @property
+    def partition_case_service(
+        self,
+    ) -> PartitionCaseService:
+        """
+        Return the Partition Case application service.
+        """
+
+        return self._partition_case_service
+
+    # ------------------------------------------------------------------
+    # Metadata
     # ------------------------------------------------------------------
 
     @property
     def application_name(
         self,
     ) -> str:
-        """
-        Return the application name.
-        """
 
         return self.settings.application_name
 
@@ -89,9 +120,6 @@ class ApplicationContext:
     def version(
         self,
     ) -> str:
-        """
-        Return the application version.
-        """
 
         return self.settings.application_version
 
@@ -99,8 +127,5 @@ class ApplicationContext:
     def organization(
         self,
     ) -> str:
-        """
-        Return the organization name.
-        """
 
         return self.settings.organization_name
