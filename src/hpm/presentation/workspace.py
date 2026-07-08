@@ -6,14 +6,17 @@ Application workspace.
 
 from __future__ import annotations
 
-from PySide6.QtWidgets import QStackedWidget
-
 from hpm.application.application_context import (
     ApplicationContext,
 )
-from hpm.presentation.dashboard.dashboard_widget import (
-    DashboardWidget,
+from hpm.presentation.browser.case_browser_page import (
+    CaseBrowserPage,
 )
+from hpm.presentation.dashboard.dashboard_page import (
+    DashboardPage,
+)
+
+from PySide6.QtWidgets import QStackedWidget
 
 
 class Workspace(QStackedWidget):
@@ -31,24 +34,59 @@ class Workspace(QStackedWidget):
 
         self._context = context
 
-        self._dashboard = DashboardWidget(
-            self._context,
-        )
+        self._pages: dict[str, int] = {}
 
-        self.addWidget(
-            self._dashboard,
-        )
+        self._register_pages()
 
-        self.setCurrentWidget(
-            self._dashboard,
-        )
-
-    @property
-    def dashboard(
+    def _register_pages(
         self,
-    ) -> DashboardWidget:
+    ) -> None:
         """
-        Return the dashboard page.
+        Register application pages.
         """
 
-        return self._dashboard
+        self._add_page(
+            "Dashboard",
+            DashboardPage(
+                self._context,
+            ),
+        )
+
+        self._add_page(
+            "Partition Cases",
+            CaseBrowserPage(),
+        )
+
+    def _add_page(
+        self,
+        name: str,
+        page,
+    ) -> None:
+        """
+        Register a page.
+        """
+
+        index = self.addWidget(
+            page,
+        )
+
+        self._pages[name] = index
+
+    def show_page(
+        self,
+        name: str,
+    ) -> None:
+        """
+        Display a page.
+        """
+
+        index = self._pages.get(
+            name,
+        )
+
+        if index is None:
+            return
+
+        self.setCurrentIndex(
+            index,
+        )

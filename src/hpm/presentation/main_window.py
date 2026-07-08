@@ -148,6 +148,31 @@ class MainWindow(QMainWindow):
             ]
         )
 
+        #
+        # Connect Signals
+        #
+
+        self._connect_signals()
+
+        #
+        # Central Widget
+        #
+
         self.setCentralWidget(
             splitter,
+        )
+
+        self.setCentralWidget(
+            splitter,
+        )
+
+    def _connect_signals(
+        self,
+    ) -> None:
+        """
+        Connect application signals.
+        """
+
+        self._navigator.currentTextChanged.connect(
+            self._workspace.show_page,
         )
