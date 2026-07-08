@@ -1,0 +1,9 @@
+Release A2.0.0
+---------------
+✓ Configuration System
+✓ Application Context
+✓ Settings Persistence
+
+Release A2.1.0
+---------------
+□ Create Partition Case

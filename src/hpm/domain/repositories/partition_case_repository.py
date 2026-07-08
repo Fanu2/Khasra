@@ -14,7 +14,7 @@ from hpm.domain.entities.partition_case import PartitionCase
 
 class PartitionCaseRepository(ABC):
     """
-    Repository contract for partition cases.
+    Repository interface for partition cases.
     """
 
     @abstractmethod
@@ -28,12 +28,22 @@ class PartitionCaseRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get(
+    def get_by_id(
+        self,
+        case_id: str,
+    ) -> PartitionCase | None:
+        """
+        Return a partition case by its unique identifier.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_by_case_number(
         self,
         case_number: str,
     ) -> PartitionCase | None:
         """
-        Return a partition case by case number.
+        Return a partition case by its case number.
         """
         raise NotImplementedError
 
@@ -59,9 +69,19 @@ class PartitionCaseRepository(ABC):
     @abstractmethod
     def delete(
         self,
-        case_number: str,
+        case_id: str,
     ) -> None:
         """
         Delete a partition case.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def exists(
+        self,
+        case_number: str,
+    ) -> bool:
+        """
+        Return True if the case number already exists.
         """
         raise NotImplementedError

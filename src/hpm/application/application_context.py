@@ -3,9 +3,9 @@ Haryana Partition Manager (HPM)
 
 Application context.
 
-The ApplicationContext acts as the composition root for the
-application. It owns long-lived services and exposes application
-metadata to the presentation layer.
+The ApplicationContext is the composition root of the application.
+It owns long-lived services and exposes shared application resources
+to the presentation layer.
 """
 
 from __future__ import annotations
@@ -18,23 +18,37 @@ class ApplicationContext:
     """
     Shared application context.
 
-    This class owns application-wide services and provides
-    a single access point for application configuration.
+    This class is responsible for creating and managing application-wide
+    services. Presentation components should obtain shared services
+    through this class instead of constructing them directly.
     """
 
-    APPLICATION_NAME = "Haryana Partition Manager"
-    APPLICATION_VERSION = "0.1.0"
-    ORGANIZATION_NAME = "HPM Project"
-
-    def __init__(self) -> None:
+    def __init__(
+        self,
+    ) -> None:
         """
         Initialize the application context.
         """
 
+        #
+        # Core Services
+        #
+
         self._settings_service = SettingsService()
 
+        #
+        # Future Services
+        #
+        # These will be registered as they are implemented.
+        #
+        # self._database = ...
+        # self._partition_case_service = ...
+        # self._logging_service = ...
+        # self._report_service = ...
+        #
+
     # ------------------------------------------------------------------
-    # Services
+    # Core Services
     # ------------------------------------------------------------------
 
     @property
@@ -42,7 +56,7 @@ class ApplicationContext:
         self,
     ) -> SettingsService:
         """
-        Return the settings service.
+        Return the application settings service.
         """
 
         return self._settings_service
@@ -58,7 +72,7 @@ class ApplicationContext:
         return self._settings_service.settings
 
     # ------------------------------------------------------------------
-    # Application Information
+    # Application Metadata
     # ------------------------------------------------------------------
 
     @property
@@ -69,7 +83,7 @@ class ApplicationContext:
         Return the application name.
         """
 
-        return self.APPLICATION_NAME
+        return self.settings.application_name
 
     @property
     def version(
@@ -79,7 +93,7 @@ class ApplicationContext:
         Return the application version.
         """
 
-        return self.APPLICATION_VERSION
+        return self.settings.application_version
 
     @property
     def organization(
@@ -89,4 +103,4 @@ class ApplicationContext:
         Return the organization name.
         """
 
-        return self.ORGANIZATION_NAME
+        return self.settings.organization_name

@@ -1,42 +1,85 @@
 """
 Haryana Partition Manager (HPM)
 
-Partition Case entity.
+Partition Case domain entity.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import date
 from datetime import datetime
+from uuid import UUID
+from uuid import uuid4
 
 
 @dataclass(slots=True)
 class PartitionCase:
     """
-    Represents a partition case.
+    Represents one partition proceeding.
+
+    This is the aggregate root of the partition domain.
     """
 
-    case_number: str
-    village_code: str
-    village_name: str
-    jamabandi_year: str
+    #
+    # Identity
+    #
+
+    id: UUID = field(
+        default_factory=uuid4,
+    )
+
+    #
+    # Case Information
+    #
+
+    case_number: str = ""
+
+    case_type: str = "General"
+
+    order_number: str = ""
+
+    order_date: date = field(
+        default_factory=date.today,
+    )
+
+    revenue_officer: str = ""
+
+    #
+    # Revenue Information
+    #
+
+    village_code: str = ""
+
+    village_name: str = ""
+
+    jamabandi_year: str = ""
+
+    #
+    # Status
+    #
 
     status: str = "Draft"
 
-    created_at: datetime | None = None
-    modified_at: datetime | None = None
-
     remarks: str = ""
 
-    def __post_init__(self) -> None:
+    #
+    # Audit
+    #
+
+    created_at: datetime = field(
+        default_factory=datetime.now,
+    )
+
+    modified_at: datetime = field(
+        default_factory=datetime.now,
+    )
+
+    def touch(
+        self,
+    ) -> None:
         """
-        Initialize timestamps.
+        Update the modification timestamp.
         """
 
-        now = datetime.now()
-
-        if self.created_at is None:
-            self.created_at = now
-
-        if self.modified_at is None:
-            self.modified_at = now
+        self.modified_at = datetime.now()
