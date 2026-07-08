@@ -1,36 +1,50 @@
 """
 Haryana Partition Manager (HPM)
 
-Application dependency container.
+Application context.
 """
 
 from __future__ import annotations
 
+from hpm.configuration.settings import Settings
+from hpm.configuration.settings_service import SettingsService
+
 
 class ApplicationContext:
     """
-    Root dependency container.
-
-    This class owns application-wide dependencies.
-    During early development it contains only the
-    application metadata. Services and repositories
-    will be registered here in later sprints.
+    Shared application services.
     """
 
     def __init__(self) -> None:
-        self._version = "0.1.0"
-        self._application_name = "Haryana Partition Manager"
+
+        self._settings_service = SettingsService()
 
     @property
-    def application_name(self) -> str:
+    def settings_service(
+        self,
+    ) -> SettingsService:
+        """
+        Return the settings service.
+        """
+
+        return self._settings_service
+
+    @property
+    def settings(
+        self,
+    ) -> Settings:
+        """
+        Return the current settings.
+        """
+
+        return self._settings_service.settings
+
+    @property
+    def application_name(
+        self,
+    ) -> str:
         """
         Return the application name.
         """
-        return self._application_name
 
-    @property
-    def version(self) -> str:
-        """
-        Return the application version.
-        """
-        return self._version
+        return self.settings.application_name
