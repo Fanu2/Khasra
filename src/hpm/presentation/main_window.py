@@ -6,11 +6,27 @@ Main application window.
 
 from __future__ import annotations
 
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QSplitter
 
-from hpm.application.application_context import ApplicationContext
-from hpm.presentation.dashboard.dashboard_widget import (
-    DashboardWidget,
+from hpm.application.application_context import (
+    ApplicationContext,
+)
+from hpm.presentation.menu_bar import (
+    MenuBar,
+)
+from hpm.presentation.navigator import (
+    Navigator,
+)
+from hpm.presentation.status_bar import (
+    StatusBar,
+)
+from hpm.presentation.tool_bar import (
+    ToolBar,
+)
+from hpm.presentation.workspace import (
+    Workspace,
 )
 
 
@@ -34,7 +50,7 @@ class MainWindow(QMainWindow):
         self,
     ) -> None:
         """
-        Initialize the main window.
+        Initialize the application window.
         """
 
         self.setWindowTitle(
@@ -46,8 +62,92 @@ class MainWindow(QMainWindow):
             900,
         )
 
+        #
+        # Menu Bar
+        #
+
+        self._menu_bar = MenuBar(
+            self,
+        )
+
+        self.setMenuBar(
+            self._menu_bar,
+        )
+
+        #
+        # Tool Bar
+        #
+
+        self._tool_bar = ToolBar(
+            self,
+        )
+
+        self.addToolBar(
+            self._tool_bar,
+        )
+
+        #
+        # Status Bar
+        #
+
+        self._status_bar = StatusBar(
+            self,
+        )
+
+        self.setStatusBar(
+            self._status_bar,
+        )
+
+        #
+        # Navigator
+        #
+
+        self._navigator = Navigator(
+            self,
+        )
+
+        #
+        # Workspace
+        #
+
+        self._workspace = Workspace(
+            self._context,
+            self,
+        )
+
+        #
+        # Splitter
+        #
+
+        splitter = QSplitter(
+            Qt.Orientation.Horizontal,
+        )
+
+        splitter.addWidget(
+            self._navigator,
+        )
+
+        splitter.addWidget(
+            self._workspace,
+        )
+
+        splitter.setStretchFactor(
+            0,
+            0,
+        )
+
+        splitter.setStretchFactor(
+            1,
+            1,
+        )
+
+        splitter.setSizes(
+            [
+                240,
+                1160,
+            ]
+        )
+
         self.setCentralWidget(
-            DashboardWidget(
-                self._context,
-            ),
+            splitter,
         )
